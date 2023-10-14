@@ -6,6 +6,7 @@ export type jChooseOptions = {
   allowDuplicates?: boolean;
   disallowedCharsRegExp?: RegExp;
   disallowedCharsReplacement?: string;
+  addValidation?: Function;
 };
 
 export type jChooseOptionOption = {

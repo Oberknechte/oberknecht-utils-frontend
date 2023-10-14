@@ -21,3 +21,7 @@
     padding: 3px;
     margin: 2px;
 }
+
+.jChoose-select-delete {
+    cursor: pointer;
+}

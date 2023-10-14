@@ -19,9 +19,8 @@ export class jChoose {
   #options: jChooseOptions;
   #chooseOptions: jChooseOptionOptionArr[] = [];
 
-  constructor() {
-  }
-  
+  constructor() {}
+
   choose = (options?: jChooseOptions) => {
     this.#options = options ?? {};
     this.#selectContainers = [];
@@ -30,7 +29,11 @@ export class jChoose {
       ...defaultAppendClasses.map((a) => `.${a}`),
     ].forEach((selector) => {
       // @ts-ignore
-      this.#selectContainers.push(...document.querySelectorAll(selector));
+      this.#selectContainers.push(
+        ...(selector instanceof HTMLElement
+          ? [selector]
+          : document.querySelectorAll(selector))
+      );
     });
 
     this.#selectContainers.forEach((a) => this.createChoose(a));
@@ -41,6 +44,7 @@ export class jChoose {
     if (!(originalSelect instanceof HTMLSelectElement)) return;
     let chooseContainer = elements.createElement("div", {
       classes: ["jChoose-container"],
+      id: `jChoose-${originalSelect.id}`,
     });
 
     let chooseSelected = elements.createElement("div", {
@@ -79,12 +83,27 @@ export class jChoose {
       )
         return;
 
+      if (
+        this_.#options.addValidation &&
+        !this_.#options.addValidation(optionOptions.value)
+      )
+        return;
+
       let chooseOptionContainer = elements.createElement("div", {
-        classes: ["jChoose-select"]
+        classes: ["jChoose-select"],
+      });
+
+      let chooseOptionContainerInner = elements.createElement("div", {
+        classes: ["jChoose-select-inner"],
       });
 
       let chooseOptionName = elements.createElement("h", {
+        classes: ["jChoose-select-name"],
         innerText: optionOptions.name ?? optionOptions.value,
+      });
+
+      let chooseOptionDelete = elements.createElement("h", {
+        classes: ["jChoose-select-delete"],
       });
 
       if (optionOptions.name)
@@ -96,14 +115,27 @@ export class jChoose {
         value: optionOptions.value,
       });
 
-      this_.#chooseOptions.push({
+      let d = {
         ...optionOptions,
         elem: chooseOptionContainer,
         optionElem: optionOptions.optionElem ?? chooseSelectOption,
-      });
+      };
+      this_.#chooseOptions.push(d);
 
-      functions.appendChildren(chooseOptionContainer, chooseOptionName);
+      chooseOptionDelete.onclick = () => {
+        removeOption(this_.#chooseOptions.indexOf(d));
+      };
 
+      functions.appendChildren(
+        chooseOptionContainerInner,
+        chooseOptionName,
+        chooseOptionDelete
+      );
+
+      functions.appendChildren(
+        chooseOptionContainer,
+        chooseOptionContainerInner
+      );
       functions.appendChildren(chooseSelected, chooseOptionContainer);
       if (!optionOptions.optionElem)
         functions.appendChildren(originalSelect, chooseSelectOption);
@@ -155,8 +187,8 @@ export class jChoose {
       };
     })();
 
-    originalSelect.parentElement.appendChild(chooseContainer);
-    originalSelect.parentElement.insertBefore(originalSelect, chooseContainer);
+    originalSelect.parentNode.appendChild(chooseContainer);
+    originalSelect.parentNode.insertBefore(originalSelect, chooseContainer);
     originalSelect.style.display = "none";
   };
 
