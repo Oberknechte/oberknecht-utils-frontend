@@ -1,0 +1,23 @@
+/**
+ * Author: Jubewe
+ * Version: 0.0.1
+ * GitHub-Repository: https://github.com/jubewe/frontend
+ * Created with the GPL-3.0 License
+ */
+
+.jChoose-container {
+    display: flex;
+    /* flex-direction: row; */
+}
+
+.jChoose-selected {
+    /* display: flex; */
+    padding: 3px;
+}
+
+.jChoose-select {
+    display: inline-block !important;
+    display: flex;
+    padding: 3px;
+    margin: 2px;
+}
