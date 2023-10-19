@@ -7,7 +7,7 @@ import {
 import { convertToArray } from "oberknecht-utils/lib-js/utils/arrayModifiers/convertToArray.js";
 import { arrayModifiers } from "oberknecht-utils/lib-js/utils/arrayModifiers.js";
 import { isNullUndefined } from "oberknecht-utils/lib-js/utils/isNullUndefined.js";
-import { functions, elements } from "../defaults/defaults";
+import { functions, elements } from "../defaults/browser/defaults";
 
 export class jChoose {
   // #options: jChooseOptions;

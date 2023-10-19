@@ -1,4 +1,4 @@
-import { functions, elements } from "../defaults";
+import { functions, elements } from "./defaults";
 
 // @ts-ignore
 global.functions = functions;

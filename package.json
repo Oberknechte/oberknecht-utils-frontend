@@ -1,21 +1,19 @@
 {
-  "name": "frontend",
-  "version": "1.0.0",
+  "name": "oberknecht-utils-frontend",
+  "version": "0.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "ts-loader": "^9.5.0",
-    "tsc": "^2.0.4",
-    "typescript": "^5.2.2",
-    "webpack": "^5.89.0"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Oberknechte/oberknecht-utils-frontend.git"
   },
-  "dependencies": {
-    "oberknecht-utils": "^1.7.4"
-  }
+  "author": "jubewe",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/Oberknechte/oberknecht-utils-frontend/issues"
+  },
+  "homepage": "https://github.com/Oberknechte/oberknecht-utils-frontend#readme"
 }
