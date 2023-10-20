@@ -72,31 +72,52 @@ export class elements {
     return r;
   };
 
-  static parseLinks = (elemOrQuery: HTMLElement | string, target?: string) => {
+  static parseLinks = (
+    elemOrQuery: HTMLElement | string,
+    target?: string,
+    useMarkdownLinks?: boolean
+  ) => {
     let elem = functions.selectElem(elemOrQuery);
     let text = elem.innerText;
 
-    let links = text.match(regex.urlreg_()) ?? [];
-    let textSplits = text
-      .split(regex.urlreg_())
-      .filter((a) => !/^https?:\/{2}$/.test(a));
-    elem.innerHTML = "";
+    const markdownReg = /\[[^\]]+\]\([^\)]+\)/;
+    const markdownMatchText = /(?<=\[)[^\]]+(?=\])/;
+    const markdownMatchLink = /(?<=\()[^\)]+(?=\))/;
+    let markdownMatches = text.match(markdownReg) ?? [];
+    let markdownSplits = text.split(markdownReg);
 
-    textSplits.forEach((textSplit, i) => {
-      let link = links[i];
-      let textElem = elements.createElement("h", {
-        innerText: textSplit,
+    markdownSplits.forEach((markdownSplit, i) => {
+      let markdownMatch = markdownMatches[i];
+      if (!markdownMatch) return;
+
+      let markdownText = markdownMatch.match(markdownMatchText)?.[0];
+      let markdownLink = markdownMatch.match(markdownMatchLink)?.[0];
+
+      text = text.replace(markdownMatch, markdownText);
+
+      let linkElem = elements.createElement("a", {
+        innerText: markdownText,
+        href: markdownLink,
+        target: target ?? "_blank",
       });
-      elem.appendChild(textElem);
 
-      if (!link) return;
+      elem.innerHTML = elem.innerHTML.replace(
+        markdownMatch,
+        linkElem.outerHTML
+      );
+    });
+
+    text = text.replace(regex.extraSpaceRegex(), "");
+
+    let links = text.match(regex.urlreg_()) ?? [];
+    links.forEach((link) => {
       let linkElem = elements.createElement("a", {
         href: link,
         innerText: link,
         target: target ?? "_blank",
       });
 
-      elem.appendChild(linkElem);
+      elem.innerHTML = elem.innerHTML.replace(link, linkElem.outerHTML);
     });
   };
 
