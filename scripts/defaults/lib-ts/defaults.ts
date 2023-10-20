@@ -1,7 +1,7 @@
 import { convertToArray } from "oberknecht-utils/lib-js/utils/arrayModifiers/convertToArray.js";
 import { dissolveArray } from "oberknecht-utils/lib-js/utils/arrayModifiers/dissolveArray.js";
 import { getFullNumber } from "oberknecht-utils/lib-js/utils/getFullNumber.js";
-import { regex } from "oberknecht-utils/lib-ts/variables/regex";
+import { regex } from "oberknecht-utils/lib-js/variables/regex.js";
 import { elementOptions } from "./types";
 
 export class functions {

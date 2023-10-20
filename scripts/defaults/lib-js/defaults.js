@@ -4,7 +4,7 @@ exports.elements = exports.functions = void 0;
 const convertToArray_js_1 = require("oberknecht-utils/lib-js/utils/arrayModifiers/convertToArray.js");
 const dissolveArray_js_1 = require("oberknecht-utils/lib-js/utils/arrayModifiers/dissolveArray.js");
 const getFullNumber_js_1 = require("oberknecht-utils/lib-js/utils/getFullNumber.js");
-const regex_1 = require("oberknecht-utils/lib-ts/variables/regex");
+const regex_js_1 = require("oberknecht-utils/lib-js/variables/regex.js");
 class functions {
     static appendElementOptions = (element, options) => {
         if (!element || !options)
@@ -80,8 +80,8 @@ class elements {
             });
             elem.innerHTML = elem.innerHTML.replace(markdownMatch, linkElem.outerHTML);
         });
-        text = text.replace(regex_1.regex.extraSpaceRegex(), "");
-        let links = text.match(regex_1.regex.urlreg_()) ?? [];
+        text = text.replace(regex_js_1.regex.extraSpaceRegex(), "");
+        let links = text.match(regex_js_1.regex.urlreg_()) ?? [];
         links.forEach((link) => {
             let linkElem = elements.createElement("a", {
                 href: link,
@@ -100,7 +100,7 @@ class elements {
             let boldLength_ = typeof boldLength === "number"
                 ? boldLength
                 : (0, getFullNumber_js_1.getFullNumber)(textSplit.length / 2);
-            if (!noIgnoreLinks && regex_1.regex.urlreg().test(textSplit))
+            if (!noIgnoreLinks && regex_js_1.regex.urlreg().test(textSplit))
                 boldLength_ = 0;
             let boldElem = elements.createElement("h", {
                 classes: ["jADHD_bold"],
