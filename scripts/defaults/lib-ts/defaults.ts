@@ -80,7 +80,7 @@ export class elements {
     let elem = functions.selectElem(elemOrQuery);
     let text = elem.innerText;
 
-    const markdownReg = /\[[^\]]+\]\([^\)]+\)/;
+    const markdownReg = /\[[^\]]+\]\([^\)]+\)/g;
     const markdownMatchText = /(?<=\[)[^\]]+(?=\])/;
     const markdownMatchLink = /(?<=\()[^\)]+(?=\))/;
     let markdownMatches = text.match(markdownReg) ?? [];
