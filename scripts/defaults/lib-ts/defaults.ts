@@ -158,4 +158,13 @@ export class elements {
         .forEach((a) => elem.appendChild(a));
     });
   };
+
+  static parseJSONText = (s: string | Record<string, any>) => {
+    if (!["string", "object"].includes(typeof s))
+      throw Error("s is not typeof string/object");
+    let o = s;
+    if (typeof s === "string") o = JSON.parse(s);
+
+    return JSON.stringify(o, null, 2);
+  };
 }
