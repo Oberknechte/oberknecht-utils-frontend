@@ -1,0 +1,49 @@
+:root {
+  --padding-default: 2px;
+  --padding-small: 0.7px;
+  --borderRadius-default: 5px;
+
+  --color-white: #f1faee;
+  --color-green: #a1c181;
+  --color-red: #bc3908;
+  --color-orange: #f6aa1c;
+  --color-orange-2: #cd8e17;
+  --color-dark: #0d1321;
+
+  --color-background: #233d4d;
+  --color-background-1: #619b8a;
+  --color-background-2: #3e5c76;
+  --color-background-3: #38a3a5;
+  --color-background-4: #467a9a;
+  --color-background-5: #4ad7db;
+  --color-background-6: #2e8588;
+  --color-background-7: #57cc99;
+  --color-background-8: #5d8ab1;
+  --color-background-9: #1d2d44;
+  --color-background-popout: #1d2d44;
+  --color-background-chat-user: #2e8588;
+  --color-background-chat-timestamp: #4ad7db;
+  --color-background-chat-message: #174445;
+  --color-background-chat-message-input: #345b73;
+  --color-background-chat-message-input-outline: #467a9a;
+  --color-background-chat-users-add-input: #345b73;
+  --color-background-chat-users-add-outline: #467a9a;
+  --color-background-chat-chats-active: #5d8ab1;
+
+  --color-border-light: #f1faee75;
+  --color-border-dark: #0d132185;
+  --color-border-chat-messages-user: #45c8cc;
+  --color-border-chat-messages-timestamp: #2e8588;
+
+  --color-background-process: #a8dadc;
+
+  --font-size-default: 15px;
+  --font-size-default-big: 23px;
+  --font-size-default-big-2: 30px;
+  --font-size-default-small: 15px;
+
+  --margin-default: 2px;
+
+  padding: var(--padding-default);
+  border-radius: var(--borderRadius-default);
+}

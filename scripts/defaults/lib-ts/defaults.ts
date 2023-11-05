@@ -2,9 +2,20 @@ import { convertToArray } from "oberknecht-utils/lib-js/utils/arrayModifiers/con
 import { dissolveArray } from "oberknecht-utils/lib-js/utils/arrayModifiers/dissolveArray.js";
 import { getFullNumber } from "oberknecht-utils/lib-js/utils/getFullNumber.js";
 import { regex } from "oberknecht-utils/lib-js/variables/regex.js";
-import { elementOptions } from "./types";
+import {
+  elemType,
+  elementOptions,
+  functionsSettingsType,
+  getElementType,
+  jPopoutType,
+  version,
+} from "./types";
 
 export class functions {
+  static url = new URL(document.baseURI);
+  static version: version;
+  static settings: functionsSettingsType;
+
   static appendElementOptions = (
     element?: HTMLElement,
     options?: elementOptions
@@ -50,10 +61,18 @@ export class functions {
     return typeof window !== "undefined";
   };
 
-  static selectElem = (elemOrQuery: HTMLElement | string): HTMLElement => {
+  static getElement = (elemOrQuery: elemType | string): HTMLElement => {
     if (!this.checkBrowser()) throw Error("Not in browser");
-    if (elemOrQuery instanceof HTMLElement) return elemOrQuery;
+    if (typeof elemOrQuery !== "string") return elemOrQuery as HTMLElement;
     return document.querySelector(elemOrQuery);
+  };
+
+  static parseIconURL = (u: string, size?: string) => {
+    let u_ = new URL(u.startsWith("/") ? this.url.origin + u : u);
+    if (this.version) u_.searchParams.set("version", this.version.npm);
+    if (!u_.searchParams.get("size") && size !== null)
+      u_.searchParams.set("size", size ?? "48");
+    return u_.toString();
   };
 }
 
@@ -73,11 +92,11 @@ export class elements {
   };
 
   static parseLinks = (
-    elemOrQuery: HTMLElement | string,
+    elemOrQuery: getElementType,
     target?: string,
     useMarkdownLinks?: boolean
   ) => {
-    let elem = functions.selectElem(elemOrQuery);
+    let elem = functions.getElement(elemOrQuery);
     let text = elem.innerText;
 
     const markdownReg = /\[[^\]]+\]\([^\)]+\)/g;
@@ -127,7 +146,7 @@ export class elements {
     noIgnoreLinks?: boolean,
     ignoreCheck?: Function
   ) => {
-    let elem = functions.selectElem(elemOrQuery);
+    let elem = functions.getElement(elemOrQuery);
     let text = elem.innerText;
 
     let textSplits = text.split(" ");
@@ -166,5 +185,129 @@ export class elements {
     if (typeof s === "string") o = JSON.parse(s);
 
     return JSON.stringify(o, null, 2);
+  };
+
+  static popout = (
+    title: string,
+    innerElems: elemType[],
+    parentElem?: HTMLElement
+  ): jPopoutType => {
+    let parentElem_ = parentElem ?? document.querySelector("body");
+    if (!parentElem_.querySelector("jpopout"))
+      parentElem_.appendChild(
+        elements.createElement("jpopout", {
+          classes: ["dp-none"],
+        })
+      );
+    if (!parentElem_.querySelector("jpopoutbg"))
+      parentElem_.appendChild(
+        elements.createElement("jpopoutbg", {
+          classes: ["dp-none"],
+        })
+      );
+
+    let popoutWindow: jPopoutType = parentElem_.querySelector("jpopout");
+    let popoutWindowBackground = parentElem_.querySelector("jpopoutbg");
+    popoutWindow.classList.remove("dp-none");
+    popoutWindowBackground.classList.remove("dp-none");
+    (async () => {
+      elementModifiers.tempClass(popoutWindow, "jpopout-enable", 250);
+      await elementModifiers.tempClass(
+        popoutWindowBackground,
+        "jpopoutbg-enable",
+        250
+      );
+      popoutWindow.classList.remove("jpopout-enable");
+      popoutWindowBackground.classList.remove("jpopoutbg-enable");
+    })();
+    popoutWindow.innerHTML = "";
+
+    function closePopout() {
+      (async () => {
+        elementModifiers.tempClass(popoutWindow, "jpopout-disable", 250);
+        await elementModifiers.tempClass(
+          popoutWindowBackground,
+          "jpopoutbg-disable",
+          250
+        );
+        popoutWindow.classList.remove("jpopout-disable");
+        popoutWindow.classList.add("dp-none");
+        popoutWindowBackground.classList.remove("jpopoutbg-disable");
+        popoutWindowBackground.classList.add("dp-none");
+      })();
+    }
+
+    let innerElems_ = Array.isArray(innerElems) ? innerElems : [innerElems];
+
+    let popoutTop = elements.createElement("jpopout-top");
+    (() => {
+      let popoutTitle = elements.createElement("jtitle", {
+        innerText: title ?? "",
+      });
+
+      let popoutClose = elements.createElement("img", {
+        classes: ["jpopout-close", "cursor-pointer"],
+        src: functions.parseIconURL("/img/x-red.png"),
+      });
+
+      [
+        ...innerElems_,
+        ...(!popoutWindow.closePopout ? [popoutWindow] : []),
+      ].forEach((a) => {
+        Object.defineProperty(a, "closePopout", {
+          get() {
+            return closePopout;
+          },
+        });
+      });
+
+      popoutClose.onclick = () => {
+        closePopout();
+      };
+
+      [popoutTitle, popoutClose].forEach((a) => popoutTop.appendChild(a));
+    })();
+
+    let popoutBottom = elements.createElement("jpopout-bottom");
+    (() => {
+      innerElems_.forEach((a) => popoutBottom.appendChild(a));
+    })();
+
+    [popoutTop, popoutBottom].forEach((a) => popoutWindow.appendChild(a));
+
+    return popoutWindow;
+  };
+}
+
+export class elementModifiers {
+  static tempClass = (
+    elem: getElementType,
+    classNames: string | string[],
+    duration?: number
+  ) => {
+    return new Promise<void>((resolve) => {
+      let elem_ = functions.getElement(elem);
+      let classNames_ = convertToArray(classNames, false);
+      classNames_ = classNames_.filter((a) => !elem_.classList.contains(a));
+
+      if (classNames_.length === 0) return;
+      elem_.classList.add(...classNames_);
+      setTimeout(() => {
+        elem_.classList.remove(...classNames_);
+        resolve();
+      }, duration ?? 5000);
+    });
+  };
+
+  static tempErrorHighlight = (elem, duration) => {
+    this.tempClass(elem, ["error-highlight"], duration);
+  };
+
+  static disable = (elem) => {
+    elem.setAttribute("disabled", "");
+  };
+
+  static enable = (elem) => {
+    elem.removeAttribute("disabled");
   };
 }
