@@ -1,11 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.elements = exports.functions = void 0;
+exports.elementModifiers = exports.elements = exports.functions = void 0;
 const convertToArray_js_1 = require("oberknecht-utils/lib-js/utils/arrayModifiers/convertToArray.js");
 const dissolveArray_js_1 = require("oberknecht-utils/lib-js/utils/arrayModifiers/dissolveArray.js");
 const getFullNumber_js_1 = require("oberknecht-utils/lib-js/utils/getFullNumber.js");
 const regex_js_1 = require("oberknecht-utils/lib-js/variables/regex.js");
 class functions {
+    static url = new URL(document.baseURI);
+    static version;
+    static settings;
     static appendElementOptions = (element, options) => {
         if (!element || !options)
             return;
@@ -42,12 +45,20 @@ class functions {
     static checkBrowser = () => {
         return typeof window !== "undefined";
     };
-    static selectElem = (elemOrQuery) => {
+    static getElement = (elemOrQuery) => {
         if (!this.checkBrowser())
             throw Error("Not in browser");
-        if (elemOrQuery instanceof HTMLElement)
+        if (typeof elemOrQuery !== "string")
             return elemOrQuery;
         return document.querySelector(elemOrQuery);
+    };
+    static parseIconURL = (u, size) => {
+        let u_ = new URL(u.startsWith("/") ? this.url.origin + u : u);
+        if (this.version)
+            u_.searchParams.set("version", this.version.npm);
+        if (!u_.searchParams.get("size") && size !== null)
+            u_.searchParams.set("size", size ?? "48");
+        return u_.toString();
     };
 }
 exports.functions = functions;
@@ -59,7 +70,7 @@ class elements {
         return r;
     };
     static parseLinks = (elemOrQuery, target, useMarkdownLinks) => {
-        let elem = functions.selectElem(elemOrQuery);
+        let elem = functions.getElement(elemOrQuery);
         let text = elem.innerText;
         const markdownReg = /\[[^\]]+\]\([^\)]+\)/g;
         const markdownMatchText = /(?<=\[)[^\]]+(?=\])/;
@@ -92,7 +103,7 @@ class elements {
         });
     };
     static parseADHD = (elemOrQuery, boldLength, noIgnoreLinks, ignoreCheck) => {
-        let elem = functions.selectElem(elemOrQuery);
+        let elem = functions.getElement(elemOrQuery);
         let text = elem.innerText;
         let textSplits = text.split(" ");
         elem.innerHTML = "";
@@ -125,5 +136,98 @@ class elements {
             o = JSON.parse(s);
         return JSON.stringify(o, null, 2);
     };
+    static popout = (title, innerElems, parentElem) => {
+        let parentElem_ = parentElem ?? document.querySelector("body");
+        if (!parentElem_.querySelector("jpopout"))
+            parentElem_.appendChild(elements.createElement("jpopout", {
+                classes: ["dp-none"],
+            }));
+        if (!parentElem_.querySelector("jpopoutbg"))
+            parentElem_.appendChild(elements.createElement("jpopoutbg", {
+                classes: ["dp-none"],
+            }));
+        let popoutWindow = parentElem_.querySelector("jpopout");
+        let popoutWindowBackground = parentElem_.querySelector("jpopoutbg");
+        popoutWindow.classList.remove("dp-none");
+        popoutWindowBackground.classList.remove("dp-none");
+        (async () => {
+            elementModifiers.tempClass(popoutWindow, "jpopout-enable", 250);
+            await elementModifiers.tempClass(popoutWindowBackground, "jpopoutbg-enable", 250);
+            popoutWindow.classList.remove("jpopout-enable");
+            popoutWindowBackground.classList.remove("jpopoutbg-enable");
+        })();
+        popoutWindow.innerHTML = "";
+        function closePopout() {
+            (async () => {
+                elementModifiers.tempClass(popoutWindow, "jpopout-disable", 250);
+                await elementModifiers.tempClass(popoutWindowBackground, "jpopoutbg-disable", 250);
+                popoutWindow.classList.remove("jpopout-disable");
+                popoutWindow.classList.add("dp-none");
+                popoutWindowBackground.classList.remove("jpopoutbg-disable");
+                popoutWindowBackground.classList.add("dp-none");
+            })();
+        }
+        let innerElems_ = Array.isArray(innerElems) ? innerElems : [innerElems];
+        let popoutTop = elements.createElement("jpopout-top");
+        (() => {
+            let popoutTitle = elements.createElement("jtitle", {
+                innerText: title ?? "",
+            });
+            let popoutClose = elements.createElement("img", {
+                classes: ["jpopout-close", "cursor-pointer"],
+                src: functions?.settings?.popout?.closeIconURL
+                    ? functions.parseIconURL(functions?.settings?.popout?.closeIconURL)
+                    : "https://github.com/Oberknechte/oberknecht-utils-frontend/blob/main/img/x-red-48x48.png?raw=true",
+                width: functions?.settings?.iconSize ?? 48,
+                height: functions?.settings?.iconSize ?? 48,
+            });
+            [
+                ...innerElems_,
+                ...(!popoutWindow.closePopout ? [popoutWindow] : []),
+            ].forEach((a) => {
+                Object.defineProperty(a, "closePopout", {
+                    get() {
+                        return closePopout;
+                    },
+                });
+            });
+            popoutClose.onclick = () => {
+                closePopout();
+            };
+            [popoutTitle, popoutClose].forEach((a) => popoutTop.appendChild(a));
+        })();
+        let popoutBottom = elements.createElement("jpopout-bottom");
+        (() => {
+            innerElems_.forEach((a) => popoutBottom.appendChild(a));
+        })();
+        [popoutTop, popoutBottom].forEach((a) => popoutWindow.appendChild(a));
+        return popoutWindow;
+    };
 }
 exports.elements = elements;
+class elementModifiers {
+    static tempClass = (elem, classNames, duration) => {
+        return new Promise((resolve) => {
+            let elem_ = functions.getElement(elem);
+            let classNames_ = (0, convertToArray_js_1.convertToArray)(classNames, false);
+            classNames_ = classNames_.filter((a) => !elem_.classList.contains(a));
+            if (classNames_.length === 0)
+                return;
+            elem_.classList.add(...classNames_);
+            setTimeout(() => {
+                elem_.classList.remove(...classNames_);
+                resolve();
+            }, duration ?? 5000);
+        });
+    };
+    static tempErrorHighlight = (elem, duration) => {
+        this.tempClass(elem, ["error-highlight"], duration);
+    };
+    static disable = (elem) => {
+        elem.setAttribute("disabled", "");
+    };
+    static enable = (elem) => {
+        elem.removeAttribute("disabled");
+    };
+}
+exports.elementModifiers = elementModifiers;
