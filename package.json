@@ -1,6 +1,6 @@
 {
   "name": "oberknecht-utils-frontend",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "",
   "main": "",
   "scripts": {
@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/Oberknechte/oberknecht-utils-frontend#readme",
   "dependencies": {
-    "oberknecht-utils": "^1.7.8"
+    "oberknecht-utils": "^1.7.9"
   },
   "devDependencies": {
     "ts-loader": "^9.5.0",

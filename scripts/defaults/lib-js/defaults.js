@@ -77,20 +77,21 @@ class elements {
         const markdownMatchLink = /(?<=\()[^\)]+(?=\))/;
         let markdownMatches = text.match(markdownReg) ?? [];
         let markdownSplits = text.split(markdownReg);
-        markdownSplits.forEach((markdownSplit, i) => {
-            let markdownMatch = markdownMatches[i];
-            if (!markdownMatch)
-                return;
-            let markdownText = markdownMatch.match(markdownMatchText)?.[0];
-            let markdownLink = markdownMatch.match(markdownMatchLink)?.[0];
-            text = text.replace(markdownMatch, markdownText);
-            let linkElem = elements.createElement("a", {
-                innerText: markdownText,
-                href: markdownLink,
-                target: target ?? "_blank",
+        if (useMarkdownLinks)
+            markdownSplits.forEach((markdownSplit, i) => {
+                let markdownMatch = markdownMatches[i];
+                if (!markdownMatch)
+                    return;
+                let markdownText = markdownMatch.match(markdownMatchText)?.[0];
+                let markdownLink = markdownMatch.match(markdownMatchLink)?.[0];
+                text = text.replace(markdownMatch, markdownText);
+                let linkElem = elements.createElement("a", {
+                    innerText: markdownText,
+                    href: markdownLink,
+                    target: target ?? "_blank",
+                });
+                elem.innerHTML = elem.innerHTML.replace(markdownMatch, linkElem.outerHTML);
             });
-            elem.innerHTML = elem.innerHTML.replace(markdownMatch, linkElem.outerHTML);
-        });
         text = text.replace(regex_js_1.regex.extraSpaceRegex(), "");
         let links = text.match(regex_js_1.regex.urlreg_()) ?? [];
         links.forEach((link) => {
@@ -136,8 +137,10 @@ class elements {
             o = JSON.parse(s);
         return JSON.stringify(o, null, 2);
     };
-    static popout = (title, innerElems, parentElem) => {
-        let parentElem_ = parentElem ?? document.querySelector("body");
+    static popout = (popoutOptions) => {
+        if (!popoutOptions)
+            popoutOptions = {};
+        let parentElem_ = popoutOptions.parentElem ?? document.querySelector("body");
         if (!parentElem_.querySelector("jpopout"))
             parentElem_.appendChild(elements.createElement("jpopout", {
                 classes: ["dp-none"],
@@ -146,6 +149,11 @@ class elements {
             parentElem_.appendChild(elements.createElement("jpopoutbg", {
                 classes: ["dp-none"],
             }));
+        if (popoutOptions.classes)
+            functions.appendElementOptions(parentElem_, {
+                classes: popoutOptions.classes,
+            });
+        parentElem_.style.position = "relative";
         let popoutWindow = parentElem_.querySelector("jpopout");
         let popoutWindowBackground = parentElem_.querySelector("jpopoutbg");
         popoutWindow.classList.remove("dp-none");
@@ -167,11 +175,11 @@ class elements {
                 popoutWindowBackground.classList.add("dp-none");
             })();
         }
-        let innerElems_ = Array.isArray(innerElems) ? innerElems : [innerElems];
+        let innerElems_ = (0, convertToArray_js_1.convertToArray)(popoutOptions.innerElems, false, true);
         let popoutTop = elements.createElement("jpopout-top");
         (() => {
             let popoutTitle = elements.createElement("jtitle", {
-                innerText: title ?? "",
+                innerText: popoutOptions.title ?? "",
             });
             let popoutClose = elements.createElement("img", {
                 classes: ["jpopout-close", "cursor-pointer"],

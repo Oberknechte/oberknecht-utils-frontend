@@ -8,6 +8,7 @@ import {
   functionsSettingsType,
   getElementType,
   jPopoutType,
+  popoutOptionsType,
   version,
 } from "./types";
 
@@ -105,26 +106,27 @@ export class elements {
     let markdownMatches = text.match(markdownReg) ?? [];
     let markdownSplits = text.split(markdownReg);
 
-    markdownSplits.forEach((markdownSplit, i) => {
-      let markdownMatch = markdownMatches[i];
-      if (!markdownMatch) return;
+    if (useMarkdownLinks)
+      markdownSplits.forEach((markdownSplit, i) => {
+        let markdownMatch = markdownMatches[i];
+        if (!markdownMatch) return;
 
-      let markdownText = markdownMatch.match(markdownMatchText)?.[0];
-      let markdownLink = markdownMatch.match(markdownMatchLink)?.[0];
+        let markdownText = markdownMatch.match(markdownMatchText)?.[0];
+        let markdownLink = markdownMatch.match(markdownMatchLink)?.[0];
 
-      text = text.replace(markdownMatch, markdownText);
+        text = text.replace(markdownMatch, markdownText);
 
-      let linkElem = elements.createElement("a", {
-        innerText: markdownText,
-        href: markdownLink,
-        target: target ?? "_blank",
+        let linkElem = elements.createElement("a", {
+          innerText: markdownText,
+          href: markdownLink,
+          target: target ?? "_blank",
+        });
+
+        elem.innerHTML = elem.innerHTML.replace(
+          markdownMatch,
+          linkElem.outerHTML
+        );
       });
-
-      elem.innerHTML = elem.innerHTML.replace(
-        markdownMatch,
-        linkElem.outerHTML
-      );
-    });
 
     text = text.replace(regex.extraSpaceRegex(), "");
 
@@ -187,12 +189,10 @@ export class elements {
     return JSON.stringify(o, null, 2);
   };
 
-  static popout = (
-    title: string,
-    innerElems: elemType | elemType[],
-    parentElem?: HTMLElement
-  ): jPopoutType => {
-    let parentElem_ = parentElem ?? document.querySelector("body");
+  static popout = (popoutOptions: popoutOptionsType): jPopoutType => {
+    if (!popoutOptions) popoutOptions = {};
+    let parentElem_ =
+      popoutOptions.parentElem ?? document.querySelector("body");
     if (!parentElem_.querySelector("jpopout"))
       parentElem_.appendChild(
         elements.createElement("jpopout", {
@@ -205,6 +205,12 @@ export class elements {
           classes: ["dp-none"],
         })
       );
+
+    if (popoutOptions.classes)
+      functions.appendElementOptions(parentElem_, {
+        classes: popoutOptions.classes,
+      });
+    parentElem_.style.position = "relative";
 
     let popoutWindow: jPopoutType = parentElem_.querySelector("jpopout");
     let popoutWindowBackground = parentElem_.querySelector("jpopoutbg");
@@ -237,12 +243,12 @@ export class elements {
       })();
     }
 
-    let innerElems_ = Array.isArray(innerElems) ? innerElems : [innerElems];
+    let innerElems_ = convertToArray(popoutOptions.innerElems, false, true);
 
     let popoutTop = elements.createElement("jpopout-top");
     (() => {
       let popoutTitle = elements.createElement("jtitle", {
-        innerText: title ?? "",
+        innerText: popoutOptions.title ?? "",
       });
 
       let popoutClose = elements.createElement("img", {

@@ -1,4 +1,4 @@
-import { elemType, elementOptions, functionsSettingsType, getElementType, jPopoutType, version } from "./types";
+import { elemType, elementOptions, functionsSettingsType, getElementType, jPopoutType, popoutOptionsType, version } from "./types";
 export declare class functions {
     static url: URL;
     static version: version;
@@ -14,7 +14,7 @@ export declare class elements {
     static parseLinks: (elemOrQuery: getElementType, target?: string, useMarkdownLinks?: boolean) => void;
     static parseADHD: (elemOrQuery: HTMLElement | string, boldLength?: number, noIgnoreLinks?: boolean, ignoreCheck?: Function) => void;
     static parseJSONText: (s: string | Record<string, any>) => string;
-    static popout: (title: string, innerElems: elemType | elemType[], parentElem?: HTMLElement) => jPopoutType;
+    static popout: (popoutOptions: popoutOptionsType) => jPopoutType;
 }
 export declare class elementModifiers {
     static tempClass: (elem: getElementType, classNames: string | string[], duration?: number) => Promise<void>;

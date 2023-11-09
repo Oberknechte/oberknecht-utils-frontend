@@ -17,3 +17,9 @@ export type functionsSettingsType = {
         closeIconURL?: string;
     };
 };
+export type popoutOptionsType = {
+    title?: string;
+    innerElems?: elemType | elemType[];
+    parentElem?: HTMLElement;
+    classes?: string | string[];
+};
