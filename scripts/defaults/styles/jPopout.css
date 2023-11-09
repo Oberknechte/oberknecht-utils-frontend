@@ -24,6 +24,7 @@ jpopout {
   display: flex;
   align-items: baseline;
   justify-content: center;
+  overflow: hidden;
 }
 
 .jpopout-enable {
