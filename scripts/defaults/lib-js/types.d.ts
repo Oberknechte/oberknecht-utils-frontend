@@ -22,4 +22,5 @@ export type popoutOptionsType = {
     innerElems?: elemType | elemType[];
     parentElem?: HTMLElement;
     classes?: string | string[];
+    exitIconURL?: string;
 };
