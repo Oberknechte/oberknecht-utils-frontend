@@ -212,6 +212,8 @@ export class elements {
     parentElem_.classList.add("jpopout-parent");
 
     let popoutWindow: jPopoutType = parentElem_.querySelector("jpopout");
+    if (popoutOptions.zIndex)
+      popoutWindow.style.zIndex = popoutOptions.zIndex.toString();
     let popoutWindowBackground = parentElem_.querySelector("jpopoutbg");
     popoutWindow.classList.remove("dp-none");
     popoutWindowBackground.classList.remove("dp-none");

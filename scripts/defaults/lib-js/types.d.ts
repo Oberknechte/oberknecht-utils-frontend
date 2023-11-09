@@ -23,4 +23,5 @@ export type popoutOptionsType = {
     parentElem?: HTMLElement;
     exitIconURL?: string;
     parentOptions?: elementOptions;
+    zIndex?: number;
 };
