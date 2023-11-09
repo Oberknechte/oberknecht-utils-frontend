@@ -206,10 +206,8 @@ export class elements {
         })
       );
 
-    if (popoutOptions.classes)
-      functions.appendElementOptions(parentElem_, {
-        classes: popoutOptions.classes,
-      });
+    if (popoutOptions.parentOptions)
+      functions.appendElementOptions(parentElem_, popoutOptions.parentOptions);
 
     parentElem_.classList.add("jpopout-parent");
 
@@ -255,9 +253,13 @@ export class elements {
 
       let popoutClose = elements.createElement("img", {
         classes: ["jpopout-close", "cursor-pointer"],
-        src: popoutOptions.exitIconURL ?? functions?.settings?.popout?.closeIconURL
-          ? functions.parseIconURL(popoutOptions.exitIconURL ?? functions?.settings?.popout?.closeIconURL)
-          : "https://raw.githubusercontent.com/Oberknechte/oberknecht-utils-frontend/main/img/x-red-48x48.png",
+        src:
+          popoutOptions.exitIconURL ?? functions?.settings?.popout?.closeIconURL
+            ? functions.parseIconURL(
+                popoutOptions.exitIconURL ??
+                  functions?.settings?.popout?.closeIconURL
+              )
+            : "https://raw.githubusercontent.com/Oberknechte/oberknecht-utils-frontend/main/img/x-red-48x48.png",
         width: functions?.settings?.iconSize ?? 48,
         height: functions?.settings?.iconSize ?? 48,
       });
