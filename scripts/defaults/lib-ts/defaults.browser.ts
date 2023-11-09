@@ -4,7 +4,3 @@ import { functions, elements } from "./defaults";
 global.functions = functions;
 // @ts-ignore
 global.elements = elements;
-
-elements.popout({
-  title: "test",
-});

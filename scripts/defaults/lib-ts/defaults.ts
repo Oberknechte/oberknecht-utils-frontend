@@ -210,7 +210,8 @@ export class elements {
       functions.appendElementOptions(parentElem_, {
         classes: popoutOptions.classes,
       });
-    parentElem_.style.position = "relative";
+
+    parentElem_.classList.add("jpopout-parent");
 
     let popoutWindow: jPopoutType = parentElem_.querySelector("jpopout");
     let popoutWindowBackground = parentElem_.querySelector("jpopoutbg");
@@ -240,6 +241,7 @@ export class elements {
         popoutWindow.classList.add("dp-none");
         popoutWindowBackground.classList.remove("jpopoutbg-disable");
         popoutWindowBackground.classList.add("dp-none");
+        parentElem_.classList.remove("jpopout-parent");
       })();
     }
 

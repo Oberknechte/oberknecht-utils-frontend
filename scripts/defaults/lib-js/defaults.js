@@ -153,7 +153,7 @@ class elements {
             functions.appendElementOptions(parentElem_, {
                 classes: popoutOptions.classes,
             });
-        parentElem_.style.position = "relative";
+        parentElem_.classList.add("jpopout-parent");
         let popoutWindow = parentElem_.querySelector("jpopout");
         let popoutWindowBackground = parentElem_.querySelector("jpopoutbg");
         popoutWindow.classList.remove("dp-none");
@@ -173,6 +173,7 @@ class elements {
                 popoutWindow.classList.add("dp-none");
                 popoutWindowBackground.classList.remove("jpopoutbg-disable");
                 popoutWindowBackground.classList.add("dp-none");
+                parentElem_.classList.remove("jpopout-parent");
             })();
         }
         let innerElems_ = (0, convertToArray_js_1.convertToArray)(popoutOptions.innerElems, false, true);

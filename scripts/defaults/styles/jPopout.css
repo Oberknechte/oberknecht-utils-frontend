@@ -18,8 +18,12 @@ jpopout {
   padding: 10px;
   overflow: hidden;
   position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+}
+
+.jpopout-parent {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
 }
 
 .jpopout-enable {
