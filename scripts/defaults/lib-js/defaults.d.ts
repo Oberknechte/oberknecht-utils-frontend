@@ -14,7 +14,7 @@ export declare class elements {
     static parseLinks: (elemOrQuery: getElementType, target?: string, useMarkdownLinks?: boolean) => void;
     static parseADHD: (elemOrQuery: HTMLElement | string, boldLength?: number, noIgnoreLinks?: boolean, ignoreCheck?: Function) => void;
     static parseJSONText: (s: string | Record<string, any>) => string;
-    static popout: (title: string, innerElems: elemType[], parentElem?: HTMLElement) => jPopoutType;
+    static popout: (title: string, innerElems: elemType | elemType[], parentElem?: HTMLElement) => jPopoutType;
 }
 export declare class elementModifiers {
     static tempClass: (elem: getElementType, classNames: string | string[], duration?: number) => Promise<void>;

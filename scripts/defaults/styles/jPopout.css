@@ -1,4 +1,5 @@
 @import "./jRoot.css";
+@import "./essentials.css";
 
 jpopout {
   display: flex;
@@ -55,8 +56,8 @@ jpopoutbg {
   top: 5px;
   outline: none;
   border: black thick;
-  aspect-ratio: 1/1;
   height: 20px;
+  width: 20px;
   border-radius: 100%;
   display: flex;
   align-items: center;
@@ -75,4 +76,14 @@ jpopoutbg {
   animation: popoutCloseButtonHoverRotate ease-in-out infinite;
   animation-duration: 3s;
   animation-delay: 250ms;
+}
+
+jpopout-top {
+  width: 100%;
+  text-align: center;
+}
+
+jpopout-bottom {
+  width: 100%;
+  height: 100%;
 }

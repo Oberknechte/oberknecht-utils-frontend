@@ -1,0 +1,41 @@
+@import "./jRoot.css";
+
+.dp-none {
+  display: none;
+}
+
+@keyframes m-enable {
+  0% {
+    transform-origin: center;
+    transform: scale(0);
+    width: 0px;
+    height: auto;
+  }
+
+  60% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes m-disable {
+  0% {
+    transform: scale(1.05);
+  }
+
+  40% {
+    transform: scale(1);
+    /* width: 250px; */
+    margin: var(--margin-default);
+  }
+
+  100% {
+    transform-origin: center;
+    transform: scale(0);
+    width: 0px;
+    margin: 0;
+  }
+}

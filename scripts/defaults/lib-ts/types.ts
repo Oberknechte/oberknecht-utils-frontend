@@ -18,6 +18,7 @@ export type elemType = HTMLElement | Element;
 export type getElementType = elemType | string;
 
 export type functionsSettingsType = {
+  iconSize?: number | 48;
   popout?: {
     closeIconURL?: string;
   };

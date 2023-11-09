@@ -189,7 +189,7 @@ export class elements {
 
   static popout = (
     title: string,
-    innerElems: elemType[],
+    innerElems: elemType | elemType[],
     parentElem?: HTMLElement
   ): jPopoutType => {
     let parentElem_ = parentElem ?? document.querySelector("body");
@@ -247,7 +247,11 @@ export class elements {
 
       let popoutClose = elements.createElement("img", {
         classes: ["jpopout-close", "cursor-pointer"],
-        src: functions.parseIconURL("/img/x-red.png"),
+        src: functions?.settings?.popout?.closeIconURL
+          ? functions.parseIconURL(functions?.settings?.popout?.closeIconURL)
+          : "https://github.com/Oberknechte/oberknecht-utils-frontend/blob/main/img/x-red-48x48.png?raw=true",
+        width: functions?.settings?.iconSize ?? 48,
+        height: functions?.settings?.iconSize ?? 48,
       });
 
       [
