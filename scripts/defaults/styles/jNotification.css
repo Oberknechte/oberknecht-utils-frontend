@@ -1,0 +1,139 @@
+@import "./essentials.css";
+
+jnotifications {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* justify-content: flex-start; */
+  /* align-items: center; */
+  align-items: flex-start;
+  gap: 2px;
+  position: absolute;
+  top: 10px;
+  width: 100%;
+  align-self: center;
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+jnotification {
+  display: flex;
+  flex-direction: row;
+  padding: 4px;
+  /* gap: 2px; */
+  align-items: center;
+  border: 1px solid var(--color-black);
+  border-radius: 15px;
+  /* height: 50px; */
+  height: auto;
+  width: 99%;
+  min-height: 3px;
+  /* min-height: var(--font-size-default); */
+  overflow: hidden;
+  position: relative;
+}
+
+jnotification > * {
+  margin-left: 4px;
+  margin-right: 4px;
+}
+
+/* .jnotification {
+    width: -moz-available;
+} */
+
+.jnotification-buttoncontainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.jnotification-button-close {
+  /* display: flex;
+  align-items: center;
+  justify-content: center; */
+  border-radius: 100%;
+  aspect-ratio: 1/1;
+  height: 20px;
+  filter: grayscale(100%);
+  background-color: transparent;
+  border: transparent;
+  transform: scale(1);
+  transition: transform 250ms;
+}
+
+.jnotification-button-close:hover {
+  transform: scale(1.2);
+  transition: transform 250ms;
+  /* animation: j-button-rotate ease-in-out infinite; */
+  /* animation-duration: 3s; */
+  /* animation-delay: 250ms; */
+}
+
+.jnotification-green {
+  background-color: var(--color-green);
+}
+
+.jnotification-red {
+  background-color: var(--color-red);
+}
+
+.jnotification-text {
+  width: 100%;
+}
+
+.jnotification-button {
+  width: 25px;
+  aspect-ratio: 1/1;
+}
+
+.jnotification-button > * {
+  width: 90%;
+  width: -moz-available;
+  vertical-align: middle;
+}
+
+.jnotification-enable {
+  animation: jnotification-enable 500ms ease-in-out;
+}
+
+.jnotification-disable {
+  animation: jnotification-disable 250ms ease-out;
+}
+
+.jnotification-parent {
+  position: relative;
+  /* display: flex;
+  justify-content: center;
+  align-items: baseline; */
+}
+
+@keyframes jnotification-enable {
+  0% {
+    display: none;
+    height: 0;
+    width: 0;
+    font-size: 0;
+    background-color: transparent;
+    transform-origin: left;
+  }
+
+  100% {
+    height: 100%;
+  }
+}
+
+@keyframes jnotification-disable {
+  0% {
+    height: 100%;
+  }
+
+  100% {
+    display: none;
+    height: 0;
+    width: 0;
+    margin-left: 100%;
+    font-size: 0;
+    background-color: transparent;
+    transform-origin: right;
+  }
+}

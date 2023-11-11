@@ -1,4 +1,4 @@
-import { copyOptionsType, elemType, elementOptions, functionsSettingsType, getElementType, jPopoutType, popoutOptionsType, version } from "./types";
+import { copyOptionsType, elemType, elementOptions, functionsSettingsType, getElementType, jPopoutType, notificationOptionsType, popoutOptionsType, version } from "./types";
 export declare class functions {
     static url: URL;
     static version: version;
@@ -17,11 +17,13 @@ export declare class elements {
     static parseLinks: (elemOrQuery: getElementType, target?: string, useMarkdownLinks?: boolean) => void;
     static parseADHD: (elemOrQuery: HTMLElement | string, boldLength?: number, noIgnoreLinks?: boolean, ignoreCheck?: Function) => void;
     static parseJSONText: (s: string | Record<string, any>) => string;
+    static convertToArray: (a: any | any[]) => any[];
     static get getPopoutCount(): number;
     static popout: (popoutOptions_?: popoutOptionsType) => jPopoutType;
+    static notification: (dat: string | Error | any, notificationOptions_?: notificationOptionsType) => void;
 }
 export declare class elementModifiers {
-    static tempClass: (elem: getElementType, classNames: string | string[], duration?: number) => Promise<void>;
+    static tempClass: (elem: getElementType, classNames: string | string[], duration?: number, neverResolveOnForever?: boolean) => Promise<void>;
     static tempErrorHighlight: (elem: any, duration: any) => void;
     static disable: (elem: any) => void;
     static enable: (elem: any) => void;

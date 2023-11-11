@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.elementModifiers = exports.elements = exports.functions = void 0;
 const regex_js_1 = require("oberknecht-utils/lib-js/variables/regex.js");
 const utils_1 = require("oberknecht-utils/lib-js/utils");
+const types_1 = require("./types");
 class functions {
     static url = new URL(document.baseURI);
     static version;
@@ -93,7 +94,7 @@ class functions {
         if (!withoutAnimation && elemOrData instanceof HTMLElement) {
             let animationParent = functions.getParent(elemOrData, copyOptions.animationParentsNum ?? 0) ??
                 elemOrData;
-            let animationDuration = copyOptions.animationDuration ?? 3000;
+            let animationDuration = copyOptions.animationDuration ?? types_1.defaultCopyAnimationDuration;
             await elementModifiers.tempClass(animationParent, ["jcopied-enable"], 300);
             await elementModifiers.tempClass(animationParent, ["jcopied"], animationDuration);
             await elementModifiers.tempClass(animationParent, ["jcopied-disable"], 500);
@@ -176,6 +177,11 @@ class elements {
             o = JSON.parse(s);
         return JSON.stringify(o, null, 2);
     };
+    static convertToArray = (a) => {
+        if (Array.isArray(a))
+            return a;
+        return [a];
+    };
     static #popoutCount = 0;
     static get getPopoutCount() {
         return this.#popoutCount;
@@ -216,7 +222,7 @@ class elements {
         popoutWindow.classList.remove("dp-none");
         popoutWindowBackground.classList.remove("dp-none");
         (async () => {
-            elementModifiers.tempClass(popoutWindow, "jpopout-enable", 250);
+            await elementModifiers.tempClass(popoutWindow, "jpopout-enable", 250);
             await elementModifiers.tempClass(popoutWindowBackground, "jpopoutbg-enable", 250);
             popoutWindow.classList.remove("jpopout-enable");
             popoutWindowBackground.classList.remove("jpopoutbg-enable");
@@ -250,9 +256,7 @@ class elements {
             });
             let popoutClose = elements.createElement("img", {
                 classes: ["jpopout-close", "cursor-pointer"],
-                src: popoutOptions.exitIconURL
-                    ? functions.parseIconURL(popoutOptions.exitIconURL)
-                    : "https://raw.githubusercontent.com/Oberknechte/oberknecht-utils-frontend/main/img/x-red-48x48.png",
+                src: popoutOptions.exitIconURL ?? types_1.defaultExitIconURL,
                 width: functions?.options?.iconSize ?? 48,
                 height: functions?.options?.iconSize ?? 48,
             });
@@ -279,10 +283,113 @@ class elements {
         [popoutTop, popoutBottom].forEach((a) => popoutWindow.appendChild(a));
         return popoutWindow;
     };
+    static notification = (dat, notificationOptions_) => {
+        let notificationOptions = (0, utils_1.concatJSON)([
+            functions.options?.notificationOptions ?? {},
+            notificationOptions_ ?? {},
+        ]);
+        let isErr = notificationOptions.isError ||
+            (dat?.data?.error ?? dat?.error ?? dat) instanceof Error;
+        let animationDuration = isErr
+            ? notificationOptions.animationDurationError ??
+                types_1.defaultNotificationErrorAnimationDuration
+            : notificationOptions.animationDuration ??
+                types_1.defaultNotificationAnimationDuration;
+        let notificationsParentElem = functions.getElement(notificationOptions.parentElem ?? "body");
+        let notificationsContainerElem = notificationsParentElem.querySelector("jnotifications");
+        if (!notificationsContainerElem) {
+            notificationsContainerElem = elements.createElement("jnotifications");
+            notificationsParentElem.appendChild(notificationsContainerElem);
+        }
+        let notificationElem = notificationsContainerElem.querySelector("jnotification");
+        if (!notificationElem || !notificationOptions.reuseOpenedNotification) {
+            notificationElem = elements.createElement("jnotification");
+            notificationsContainerElem.appendChild(notificationElem);
+        }
+        function getNotificationsCount() {
+            return [...notificationsContainerElem.querySelectorAll("jnotification")]
+                .length;
+        }
+        notificationsParentElem.classList.add("jnotification-parent");
+        notificationElem.innerHTML = "";
+        (() => {
+            let notificationTextElem = elements.createElement("jh", {
+                classes: ["jnotification-text"],
+                innerText: isErr ? "Error: " + (0, utils_1.returnErr)(dat) : dat,
+            });
+            let notificationButtonContainer = elements.createElement("div", {
+                classes: ["jnotification-buttoncontainer"],
+            });
+            let notificationCloseButton = elements.createElement("button", {
+                classes: ["jnotification-button-close"],
+            });
+            [
+                notificationCloseButton,
+                ...(0, utils_1.convertToArray)(notificationOptions.notificationButtons, false),
+            ].forEach((a) => {
+                a.classList.add("jnotification-button");
+                notificationButtonContainer.appendChild(a);
+            });
+            (() => {
+                let notificationCloseButtonImg = elements.createElement("img", {
+                    src: notificationOptions.exitIconURL ?? types_1.defaultExitIconURL,
+                    style: {
+                        userSelect: "none",
+                    },
+                });
+                notificationCloseButton.appendChild(notificationCloseButtonImg);
+                notificationCloseButton.onclick = () => {
+                    closeNotification();
+                };
+            })();
+            [notificationTextElem, notificationButtonContainer].forEach((a) => notificationElem.appendChild(a));
+        })();
+        if (notificationOptions.zIndex)
+            notificationElem.style.zIndex = notificationOptions.zIndex.toString();
+        notificationElem.classList.remove("dp-none");
+        (async () => {
+            notificationElem.classList.add(isErr ? "jnotification-red" : "jnotification-green");
+            if (notificationOptions.elementOptions)
+                functions.appendElementOptions(notificationElem, notificationOptions.elementOptions);
+            await elementModifiers.tempClass(notificationElem, ["jnotification-enable"], 
+            // 1500
+            500);
+            await elementModifiers.tempClass(notificationElem, ["jnotification"], animationDuration, true);
+            await closeNotification();
+        })();
+        async function closeNotification() {
+            notificationElem.classList.remove("jnotification");
+            await elementModifiers.tempClass(notificationElem, ["jnotification-disable"], 250);
+            notificationElem.classList.add("dp-none");
+            let notificationCount = getNotificationsCount() - 1;
+            if (!notificationOptions.noRemoveAfterClose)
+                notificationElem.remove();
+            if (notificationCount === 0 &&
+                !notificationOptions.noRemoveContainerAfterClose) {
+                notificationsContainerElem.remove();
+                notificationsParentElem.classList.remove("jnotification-parent");
+            }
+        }
+        [
+            notificationElem,
+            notificationsContainerElem,
+            notificationsParentElem,
+            ...[...notificationElem.childNodes],
+        ].forEach((a) => {
+            // @ts-ignore
+            if (a.closeNotification)
+                return;
+            Object.defineProperty(a, "closeNotification", {
+                get() {
+                    return closeNotification;
+                },
+            });
+        });
+    };
 }
 exports.elements = elements;
 class elementModifiers {
-    static tempClass = (elem, classNames, duration) => {
+    static tempClass = (elem, classNames, duration, neverResolveOnForever) => {
         return new Promise((resolve) => {
             let elem_ = functions.getElement(elem);
             let classNames_ = (0, utils_1.convertToArray)(classNames, false);
@@ -290,6 +397,11 @@ class elementModifiers {
             if (classNames_.length === 0)
                 return;
             elem_.classList.add(...classNames_);
+            if (duration <= 0 || duration >= 2147483647) {
+                if (!neverResolveOnForever)
+                    return resolve();
+                return;
+            }
             setTimeout(() => {
                 elem_.classList.remove(...classNames_);
                 resolve();

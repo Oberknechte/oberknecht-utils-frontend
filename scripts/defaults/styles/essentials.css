@@ -1,7 +1,11 @@
 @import "./jRoot.css";
 
+button {
+  cursor: pointer;
+}
+
 .dp-none {
-  display: none;
+  display: none !important;
 }
 
 .jcopied {
@@ -70,5 +74,17 @@
   100% {
     background-color: initial;
     /* background-color: red; */
+  }
+}
+
+@keyframes j-button-rotate {
+  0% {
+    transform: scale(1.2) rotate(0deg);
+  }
+  50% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.2) rotate(90deg);
   }
 }
