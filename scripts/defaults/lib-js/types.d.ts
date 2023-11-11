@@ -13,9 +13,7 @@ export type elemType = HTMLElement | Element;
 export type getElementType = elemType | string;
 export type functionsSettingsType = {
     iconSize?: number | 48;
-    popout?: {
-        closeIconURL?: string;
-    };
+    popoutOptions: popoutOptionsType;
 };
 export type popoutOptionsType = {
     title?: string;
@@ -25,6 +23,7 @@ export type popoutOptionsType = {
     parentOptions?: elementOptions;
     reuseOpenedPopout?: boolean;
     zIndex?: number;
+    noRemoveAfterClose?: boolean;
     onClose?: Function;
     onClosed?: Function;
 };

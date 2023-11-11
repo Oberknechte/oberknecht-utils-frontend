@@ -2,6 +2,7 @@ import { convertToArray } from "oberknecht-utils/lib-js/utils/arrayModifiers/con
 import { dissolveArray } from "oberknecht-utils/lib-js/utils/arrayModifiers/dissolveArray.js";
 import { getFullNumber } from "oberknecht-utils/lib-js/utils/getFullNumber.js";
 import { regex } from "oberknecht-utils/lib-js/variables/regex.js";
+import { concatJSON } from "oberknecht-utils/lib-js/utils/jsonModifiers/concatJSON";
 import {
   elemType,
   elementOptions,
@@ -15,7 +16,7 @@ import {
 export class functions {
   static url = new URL(document.baseURI);
   static version: version;
-  static settings: functionsSettingsType;
+  static options: functionsSettingsType;
 
   static appendElementOptions = (
     element?: HTMLElement,
@@ -193,9 +194,13 @@ export class elements {
   static get getPopoutCount() {
     return this.#popoutCount;
   }
-  static popout = (popoutOptions?: popoutOptionsType): jPopoutType => {
+  static popout = (popoutOptions_?: popoutOptionsType): jPopoutType => {
     this.#popoutCount++;
-    if (!popoutOptions) popoutOptions = {};
+    let popoutOptions = concatJSON([
+      functions.options?.popoutOptions ?? {},
+      popoutOptions_ ?? {},
+    ]) as popoutOptionsType;
+
     let popoutWindow: jPopoutType;
     let popoutWindowBackground: HTMLElement;
     let parentElem_ =
@@ -268,6 +273,10 @@ export class elements {
           parentElem_.classList.remove("jpopout-parent");
         this_.#popoutCount--;
         popoutOptions.onClosed?.();
+        if (!popoutOptions.noRemoveAfterClose) {
+          popoutWindow.remove();
+          popoutWindowBackground.remove();
+        }
       })();
     }
 
@@ -281,15 +290,11 @@ export class elements {
 
       let popoutClose = elements.createElement("img", {
         classes: ["jpopout-close", "cursor-pointer"],
-        src:
-          popoutOptions.exitIconURL ?? functions?.settings?.popout?.closeIconURL
-            ? functions.parseIconURL(
-                popoutOptions.exitIconURL ??
-                  functions?.settings?.popout?.closeIconURL
-              )
-            : "https://raw.githubusercontent.com/Oberknechte/oberknecht-utils-frontend/main/img/x-red-48x48.png",
-        width: functions?.settings?.iconSize ?? 48,
-        height: functions?.settings?.iconSize ?? 48,
+        src: popoutOptions.exitIconURL
+          ? functions.parseIconURL(popoutOptions.exitIconURL)
+          : "https://raw.githubusercontent.com/Oberknechte/oberknecht-utils-frontend/main/img/x-red-48x48.png",
+        width: functions?.options?.iconSize ?? 48,
+        height: functions?.options?.iconSize ?? 48,
       });
 
       [

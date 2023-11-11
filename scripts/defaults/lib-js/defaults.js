@@ -5,10 +5,11 @@ const convertToArray_js_1 = require("oberknecht-utils/lib-js/utils/arrayModifier
 const dissolveArray_js_1 = require("oberknecht-utils/lib-js/utils/arrayModifiers/dissolveArray.js");
 const getFullNumber_js_1 = require("oberknecht-utils/lib-js/utils/getFullNumber.js");
 const regex_js_1 = require("oberknecht-utils/lib-js/variables/regex.js");
+const concatJSON_1 = require("oberknecht-utils/lib-js/utils/jsonModifiers/concatJSON");
 class functions {
     static url = new URL(document.baseURI);
     static version;
-    static settings;
+    static options;
     static appendElementOptions = (element, options) => {
         if (!element || !options)
             return;
@@ -141,10 +142,12 @@ class elements {
     static get getPopoutCount() {
         return this.#popoutCount;
     }
-    static popout = (popoutOptions) => {
+    static popout = (popoutOptions_) => {
         this.#popoutCount++;
-        if (!popoutOptions)
-            popoutOptions = {};
+        let popoutOptions = (0, concatJSON_1.concatJSON)([
+            functions.options?.popoutOptions ?? {},
+            popoutOptions_ ?? {},
+        ]);
         let popoutWindow;
         let popoutWindowBackground;
         let parentElem_ = popoutOptions.parentElem ?? document.querySelector("body");
@@ -195,6 +198,10 @@ class elements {
                     parentElem_.classList.remove("jpopout-parent");
                 this_.#popoutCount--;
                 popoutOptions.onClosed?.();
+                if (!popoutOptions.noRemoveAfterClose) {
+                    popoutWindow.remove();
+                    popoutWindowBackground.remove();
+                }
             })();
         }
         let innerElems_ = (0, convertToArray_js_1.convertToArray)(popoutOptions.innerElems, false, true);
@@ -205,12 +212,11 @@ class elements {
             });
             let popoutClose = elements.createElement("img", {
                 classes: ["jpopout-close", "cursor-pointer"],
-                src: popoutOptions.exitIconURL ?? functions?.settings?.popout?.closeIconURL
-                    ? functions.parseIconURL(popoutOptions.exitIconURL ??
-                        functions?.settings?.popout?.closeIconURL)
+                src: popoutOptions.exitIconURL
+                    ? functions.parseIconURL(popoutOptions.exitIconURL)
                     : "https://raw.githubusercontent.com/Oberknechte/oberknecht-utils-frontend/main/img/x-red-48x48.png",
-                width: functions?.settings?.iconSize ?? 48,
-                height: functions?.settings?.iconSize ?? 48,
+                width: functions?.options?.iconSize ?? 48,
+                height: functions?.options?.iconSize ?? 48,
             });
             [
                 ...innerElems_,
