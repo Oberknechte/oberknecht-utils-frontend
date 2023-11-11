@@ -24,4 +24,6 @@ export type popoutOptionsType = {
     exitIconURL?: string;
     parentOptions?: elementOptions;
     zIndex?: number;
+    onClose?: Function;
+    onClosed?: Function;
 };

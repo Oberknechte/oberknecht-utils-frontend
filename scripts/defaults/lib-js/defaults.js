@@ -153,6 +153,8 @@ class elements {
             functions.appendElementOptions(parentElem_, popoutOptions.parentOptions);
         parentElem_.classList.add("jpopout-parent");
         let popoutWindow = parentElem_.querySelector("jpopout");
+        if (popoutOptions.zIndex)
+            popoutWindow.style.zIndex = popoutOptions.zIndex.toString();
         let popoutWindowBackground = parentElem_.querySelector("jpopoutbg");
         popoutWindow.classList.remove("dp-none");
         popoutWindowBackground.classList.remove("dp-none");
@@ -164,6 +166,7 @@ class elements {
         })();
         popoutWindow.innerHTML = "";
         function closePopout() {
+            popoutOptions.onClose?.();
             (async () => {
                 elementModifiers.tempClass(popoutWindow, "jpopout-disable", 250);
                 await elementModifiers.tempClass(popoutWindowBackground, "jpopoutbg-disable", 250);
@@ -172,6 +175,7 @@ class elements {
                 popoutWindowBackground.classList.remove("jpopoutbg-disable");
                 popoutWindowBackground.classList.add("dp-none");
                 parentElem_.classList.remove("jpopout-parent");
+                popoutOptions.onClosed?.();
             })();
         }
         let innerElems_ = (0, convertToArray_js_1.convertToArray)(popoutOptions.innerElems, false, true);
@@ -193,11 +197,12 @@ class elements {
                 ...innerElems_,
                 ...(!popoutWindow.closePopout ? [popoutWindow] : []),
             ].forEach((a) => {
-                Object.defineProperty(a, "closePopout", {
-                    get() {
-                        return closePopout;
-                    },
-                });
+                if (!a.closePopout)
+                    Object.defineProperty(a, "closePopout", {
+                        get() {
+                            return closePopout;
+                        },
+                    });
             });
             popoutClose.onclick = () => {
                 closePopout();

@@ -10,5 +10,8 @@
         "declaration": true,
         "module": "NodeNext",
         "target": "ESNext"
+    },
+    "watchOptions": {
+        "watchDirectory": "fixedpollinginterval"
     }
 }

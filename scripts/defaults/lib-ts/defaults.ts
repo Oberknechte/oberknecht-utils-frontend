@@ -230,6 +230,7 @@ export class elements {
     popoutWindow.innerHTML = "";
 
     function closePopout() {
+      popoutOptions.onClose?.();
       (async () => {
         elementModifiers.tempClass(popoutWindow, "jpopout-disable", 250);
         await elementModifiers.tempClass(
@@ -242,6 +243,7 @@ export class elements {
         popoutWindowBackground.classList.remove("jpopoutbg-disable");
         popoutWindowBackground.classList.add("dp-none");
         parentElem_.classList.remove("jpopout-parent");
+        popoutOptions.onClosed?.();
       })();
     }
 
@@ -270,7 +272,7 @@ export class elements {
         ...innerElems_,
         ...(!popoutWindow.closePopout ? [popoutWindow] : []),
       ].forEach((a) => {
-        Object.defineProperty(a, "closePopout", {
+        if(!a.closePopout) Object.defineProperty(a, "closePopout", {
           get() {
             return closePopout;
           },

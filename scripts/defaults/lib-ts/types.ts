@@ -33,4 +33,6 @@ export type popoutOptionsType = {
   // before?: HTMLElement;
   parentOptions?: elementOptions;
   zIndex?: number;
+  onClose?: Function;
+  onClosed?: Function;
 };
