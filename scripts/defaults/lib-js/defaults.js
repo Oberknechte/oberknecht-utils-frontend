@@ -45,7 +45,7 @@ class functions {
     };
     static getParent = (elem, number) => {
         if ((0, utils_1.isNullUndefined)(number) || number <= 1)
-            return elem.parentElement;
+            return elem;
         return this.getParent(elem.parentElement, (number ?? 1) - 1);
     };
     static getElement = (elemOrQuery) => {
@@ -89,7 +89,7 @@ class functions {
                 }
             }
         }
-        navigator.clipboard.writeText(copyData);
+        // navigator.clipboard.writeText(copyData);
         if (!withoutAnimation && elemOrData instanceof HTMLElement) {
             let animationParent = functions.getParent(elemOrData, copyOptions.animationParentsNum ?? 0) ??
                 elemOrData;
