@@ -1,12 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.elementModifiers = exports.elements = exports.functions = void 0;
-const convertToArray_js_1 = require("oberknecht-utils/lib-js/utils/arrayModifiers/convertToArray.js");
-const dissolveArray_js_1 = require("oberknecht-utils/lib-js/utils/arrayModifiers/dissolveArray.js");
-const getFullNumber_js_1 = require("oberknecht-utils/lib-js/utils/getFullNumber.js");
 const regex_js_1 = require("oberknecht-utils/lib-js/variables/regex.js");
-const concatJSON_1 = require("oberknecht-utils/lib-js/utils/jsonModifiers/concatJSON");
-const extendedTypeof_1 = require("oberknecht-utils/lib-js/utils/extendedTypeof");
+const utils_1 = require("oberknecht-utils/lib-js/utils");
 class functions {
     static url = new URL(document.baseURI);
     static version;
@@ -17,11 +13,11 @@ class functions {
         Object.keys(options).forEach((optionName) => {
             switch (optionName) {
                 case "classes": {
-                    (0, convertToArray_js_1.convertToArray)(options[optionName]).forEach((a) => element.classList.add(a));
+                    (0, utils_1.convertToArray)(options[optionName]).forEach((a) => element.classList.add(a));
                     break;
                 }
                 case "childNodes": {
-                    (0, convertToArray_js_1.convertToArray)(options[optionName]).forEach((a) => {
+                    (0, utils_1.convertToArray)(options[optionName]).forEach((a) => {
                         element.appendChild(a);
                     });
                     break;
@@ -42,13 +38,13 @@ class functions {
         });
     };
     static appendChildren = (elem, ...children) => {
-        [...(0, dissolveArray_js_1.dissolveArray)(...children)].forEach((a) => elem.appendChild(a));
+        [...(0, utils_1.dissolveArray)(...children)].forEach((a) => elem.appendChild(a));
     };
     static checkBrowser = () => {
         return typeof window !== "undefined";
     };
     static getParent = (elem, number) => {
-        if (!number || number <= 1)
+        if ((0, utils_1.isNullUndefined)(number) || number <= 1)
             return elem.parentElement;
         return this.getParent(elem.parentElement, (number ?? 1) - 1);
     };
@@ -68,7 +64,7 @@ class functions {
         return u_.toString();
     };
     static copy = async (elemOrData, copyOptions_) => {
-        let copyOptions = (0, concatJSON_1.concatJSON)([
+        let copyOptions = (0, utils_1.concatJSON)([
             functions.options?.copyOptions ?? {},
             copyOptions_ ?? {},
         ]);
@@ -81,7 +77,7 @@ class functions {
                     elemOrData.value ?? elemOrData.innerText ?? "";
         }
         else {
-            switch ((0, extendedTypeof_1.extendedTypeof)(elemOrData)) {
+            switch ((0, utils_1.extendedTypeof)(elemOrData)) {
                 case "json":
                 case "object": {
                     copyData = JSON.stringify(elemOrData);
@@ -154,7 +150,7 @@ class elements {
         textSplits.forEach((textSplit) => {
             let boldLength_ = typeof boldLength === "number"
                 ? boldLength
-                : (0, getFullNumber_js_1.getFullNumber)(textSplit.length / 2);
+                : (0, utils_1.getFullNumber)(textSplit.length / 2);
             if (!noIgnoreLinks && regex_js_1.regex.urlreg().test(textSplit))
                 boldLength_ = 0;
             let boldElem = elements.createElement("h", {
@@ -186,7 +182,7 @@ class elements {
     }
     static popout = (popoutOptions_) => {
         this.#popoutCount++;
-        let popoutOptions = (0, concatJSON_1.concatJSON)([
+        let popoutOptions = (0, utils_1.concatJSON)([
             functions.options?.popoutOptions ?? {},
             popoutOptions_ ?? {},
         ]);
@@ -246,7 +242,7 @@ class elements {
                 }
             })();
         }
-        let innerElems_ = (0, convertToArray_js_1.convertToArray)(popoutOptions.innerElems, false, true);
+        let innerElems_ = (0, utils_1.convertToArray)(popoutOptions.innerElems, false, true);
         let popoutTop = elements.createElement("jpopout-top");
         (() => {
             let popoutTitle = elements.createElement("jtitle", {
@@ -289,7 +285,7 @@ class elementModifiers {
     static tempClass = (elem, classNames, duration) => {
         return new Promise((resolve) => {
             let elem_ = functions.getElement(elem);
-            let classNames_ = (0, convertToArray_js_1.convertToArray)(classNames, false);
+            let classNames_ = (0, utils_1.convertToArray)(classNames, false);
             classNames_ = classNames_.filter((a) => !elem_.classList.contains(a));
             if (classNames_.length === 0)
                 return;
