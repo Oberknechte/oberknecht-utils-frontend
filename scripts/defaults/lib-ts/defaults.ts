@@ -212,9 +212,15 @@ export class elements {
     parentElem_.classList.add("jpopout-parent");
 
     let popoutWindow: jPopoutType = parentElem_.querySelector("jpopout");
-    if (popoutOptions.zIndex)
+    let popoutWindowBackground: HTMLElement = parentElem_.querySelector(
+      "jpopoutbg"
+    );
+    if (popoutOptions.zIndex) {
       popoutWindow.style.zIndex = popoutOptions.zIndex.toString();
-    let popoutWindowBackground = parentElem_.querySelector("jpopoutbg");
+      popoutWindowBackground.style.zIndex = (
+        popoutOptions.zIndex - 1
+      ).toString();
+    }
     popoutWindow.classList.remove("dp-none");
     popoutWindowBackground.classList.remove("dp-none");
     (async () => {
@@ -272,11 +278,12 @@ export class elements {
         ...innerElems_,
         ...(!popoutWindow.closePopout ? [popoutWindow] : []),
       ].forEach((a) => {
-        if(!a.closePopout) Object.defineProperty(a, "closePopout", {
-          get() {
-            return closePopout;
-          },
-        });
+        if (!a.closePopout)
+          Object.defineProperty(a, "closePopout", {
+            get() {
+              return closePopout;
+            },
+          });
       });
 
       popoutClose.onclick = () => {

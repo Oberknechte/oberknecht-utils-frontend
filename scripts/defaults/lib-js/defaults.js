@@ -153,9 +153,11 @@ class elements {
             functions.appendElementOptions(parentElem_, popoutOptions.parentOptions);
         parentElem_.classList.add("jpopout-parent");
         let popoutWindow = parentElem_.querySelector("jpopout");
-        if (popoutOptions.zIndex)
-            popoutWindow.style.zIndex = popoutOptions.zIndex.toString();
         let popoutWindowBackground = parentElem_.querySelector("jpopoutbg");
+        if (popoutOptions.zIndex) {
+            popoutWindow.style.zIndex = popoutOptions.zIndex.toString();
+            popoutWindowBackground.style.zIndex = (popoutOptions.zIndex - 1).toString();
+        }
         popoutWindow.classList.remove("dp-none");
         popoutWindowBackground.classList.remove("dp-none");
         (async () => {
