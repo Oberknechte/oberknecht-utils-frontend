@@ -114,7 +114,7 @@ export class functions {
       }
     }
 
-    // navigator.clipboard.writeText(copyData);
+    navigator.clipboard.writeText(copyData);
 
     if (!withoutAnimation && elemOrData instanceof HTMLElement) {
       let animationParent =

@@ -89,7 +89,7 @@ class functions {
                 }
             }
         }
-        // navigator.clipboard.writeText(copyData);
+        navigator.clipboard.writeText(copyData);
         if (!withoutAnimation && elemOrData instanceof HTMLElement) {
             let animationParent = functions.getParent(elemOrData, copyOptions.animationParentsNum ?? 0) ??
                 elemOrData;
