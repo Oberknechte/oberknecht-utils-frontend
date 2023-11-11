@@ -4,6 +4,18 @@
   display: none;
 }
 
+.jcopied {
+  background-color: var(--color-green);
+}
+
+.jcopied-enable {
+  animation: j-copy-enable 300ms;
+}
+
+.jcopied-disable {
+  animation: j-copy-disable 500ms;
+}
+
 @keyframes m-enable {
   0% {
     transform-origin: center;
@@ -37,5 +49,26 @@
     transform: scale(0);
     width: 0px;
     margin: 0;
+  }
+}
+
+@keyframes j-copy-enable {
+  0% {
+    background-color: initial;
+  }
+
+  100% {
+    background-color: var(--color-green);
+  }
+}
+
+@keyframes j-copy-disable {
+  0% {
+    background-color: var(--color-green);
+  }
+
+  100% {
+    background-color: initial;
+    /* background-color: red; */
   }
 }

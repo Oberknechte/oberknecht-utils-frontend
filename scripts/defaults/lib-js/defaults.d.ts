@@ -1,4 +1,4 @@
-import { elemType, elementOptions, functionsSettingsType, getElementType, jPopoutType, popoutOptionsType, version } from "./types";
+import { copyOptionsType, elemType, elementOptions, functionsSettingsType, getElementType, jPopoutType, popoutOptionsType, version } from "./types";
 export declare class functions {
     static url: URL;
     static version: version;
@@ -6,8 +6,10 @@ export declare class functions {
     static appendElementOptions: (element?: HTMLElement, options?: elementOptions) => void;
     static appendChildren: (elem: Node, ...children: Node[]) => void;
     static checkBrowser: () => boolean;
+    static getParent: (elem: HTMLElement, number?: number) => any;
     static getElement: (elemOrQuery: elemType | string) => HTMLElement;
     static parseIconURL: (u: string, size?: string) => string;
+    static copy: (elemOrData: any, copyOptions_?: copyOptionsType) => Promise<void>;
 }
 export declare class elements {
     #private;

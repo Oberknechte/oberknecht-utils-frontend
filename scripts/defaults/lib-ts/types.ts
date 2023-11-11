@@ -20,6 +20,7 @@ export type getElementType = elemType | string;
 export type functionsSettingsType = {
   iconSize?: number | 48;
   popoutOptions: popoutOptionsType;
+  copyOptions: copyOptionsType;
 };
 
 export type popoutOptionsType = {
@@ -36,3 +37,10 @@ export type popoutOptionsType = {
   onClose?: Function;
   onClosed?: Function;
 };
+
+export type copyOptionsType = {
+  withoutAnimation?: boolean;
+  customDataAttributeKey?: string;
+  animationParentsNum?: number;
+  animationDuration?: number | 3000;
+}

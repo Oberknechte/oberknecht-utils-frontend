@@ -6,6 +6,7 @@ const dissolveArray_js_1 = require("oberknecht-utils/lib-js/utils/arrayModifiers
 const getFullNumber_js_1 = require("oberknecht-utils/lib-js/utils/getFullNumber.js");
 const regex_js_1 = require("oberknecht-utils/lib-js/variables/regex.js");
 const concatJSON_1 = require("oberknecht-utils/lib-js/utils/jsonModifiers/concatJSON");
+const extendedTypeof_1 = require("oberknecht-utils/lib-js/utils/extendedTypeof");
 class functions {
     static url = new URL(document.baseURI);
     static version;
@@ -46,6 +47,11 @@ class functions {
     static checkBrowser = () => {
         return typeof window !== "undefined";
     };
+    static getParent = (elem, number) => {
+        if (!number || number <= 1)
+            return elem.parentElement;
+        return this.getParent(elem.parentElement, (number ?? 1) - 1);
+    };
     static getElement = (elemOrQuery) => {
         if (!this.checkBrowser())
             throw Error("Not in browser");
@@ -60,6 +66,42 @@ class functions {
         if (!u_.searchParams.get("size") && size !== null)
             u_.searchParams.set("size", size ?? "48");
         return u_.toString();
+    };
+    static copy = async (elemOrData, copyOptions_) => {
+        let copyOptions = (0, concatJSON_1.concatJSON)([
+            functions.options?.copyOptions ?? {},
+            copyOptions_ ?? {},
+        ]);
+        let withoutAnimation = copyOptions.withoutAnimation;
+        let copyData;
+        if (elemOrData instanceof HTMLElement) {
+            copyData = copyOptions.customDataAttributeKey
+                ? elemOrData.getAttribute(copyOptions.customDataAttributeKey)
+                : // @ts-ignore
+                    elemOrData.value ?? elemOrData.innerText ?? "";
+        }
+        else {
+            switch ((0, extendedTypeof_1.extendedTypeof)(elemOrData)) {
+                case "json":
+                case "object": {
+                    copyData = JSON.stringify(elemOrData);
+                    break;
+                }
+                default: {
+                    copyData = elemOrData?.toString();
+                    break;
+                }
+            }
+        }
+        navigator.clipboard.writeText(copyData);
+        if (!withoutAnimation && elemOrData instanceof HTMLElement) {
+            let animationParent = functions.getParent(elemOrData, copyOptions.animationParentsNum ?? 1) ??
+                elemOrData;
+            let animationDuration = copyOptions.animationDuration ?? 3000;
+            await elementModifiers.tempClass(animationParent, ["jcopied-enable"], 300);
+            await elementModifiers.tempClass(animationParent, ["jcopied"], animationDuration);
+            await elementModifiers.tempClass(animationParent, ["jcopied-disable"], 500);
+        }
     };
 }
 exports.functions = functions;
