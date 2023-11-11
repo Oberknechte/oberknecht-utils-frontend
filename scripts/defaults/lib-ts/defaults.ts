@@ -189,32 +189,47 @@ export class elements {
     return JSON.stringify(o, null, 2);
   };
 
-  static popout = (popoutOptions: popoutOptionsType): jPopoutType => {
+  static #popoutCount = 0;
+  static get getPopoutCount() {
+    return this.#popoutCount;
+  }
+  static popout = (popoutOptions?: popoutOptionsType): jPopoutType => {
+    this.#popoutCount++;
     if (!popoutOptions) popoutOptions = {};
+    let popoutWindow: jPopoutType;
+    let popoutWindowBackground: HTMLElement;
     let parentElem_ =
       popoutOptions.parentElem ?? document.querySelector("body");
-    if (!parentElem_.querySelector("jpopout"))
-      parentElem_.appendChild(
-        elements.createElement("jpopout", {
-          classes: ["dp-none"],
-        })
-      );
-    if (!parentElem_.querySelector("jpopoutbg"))
-      parentElem_.appendChild(
-        elements.createElement("jpopoutbg", {
-          classes: ["dp-none"],
-        })
-      );
+    if (
+      !parentElem_.querySelector("jpopout") ||
+      !popoutOptions.reuseOpenedPopout
+    ) {
+      popoutWindow = elements.createElement("jpopout", {
+        classes: ["dp-none"],
+      }) as jPopoutType;
+
+      parentElem_.appendChild(popoutWindow);
+    }
+    if (
+      !parentElem_.querySelector("jpopoutbg") ||
+      !popoutOptions.reuseOpenedPopout
+    ) {
+      popoutWindowBackground = elements.createElement("jpopoutbg", {
+        classes: ["dp-none"],
+      });
+
+      parentElem_.appendChild(popoutWindowBackground);
+    }
 
     if (popoutOptions.parentOptions)
       functions.appendElementOptions(parentElem_, popoutOptions.parentOptions);
 
     parentElem_.classList.add("jpopout-parent");
 
-    let popoutWindow: jPopoutType = parentElem_.querySelector("jpopout");
-    let popoutWindowBackground: HTMLElement = parentElem_.querySelector(
-      "jpopoutbg"
-    );
+    popoutWindow = popoutWindow ?? parentElem_.querySelector("jpopout");
+    popoutWindowBackground =
+      popoutWindowBackground ?? parentElem_.querySelector("jpopoutbg");
+
     if (popoutOptions.zIndex) {
       popoutWindow.style.zIndex = popoutOptions.zIndex.toString();
       popoutWindowBackground.style.zIndex = (
@@ -235,6 +250,7 @@ export class elements {
     })();
     popoutWindow.innerHTML = "";
 
+    let this_ = this;
     function closePopout() {
       popoutOptions.onClose?.();
       (async () => {
@@ -248,7 +264,9 @@ export class elements {
         popoutWindow.classList.add("dp-none");
         popoutWindowBackground.classList.remove("jpopoutbg-disable");
         popoutWindowBackground.classList.add("dp-none");
-        parentElem_.classList.remove("jpopout-parent");
+        if (this_.getPopoutCount === 1)
+          parentElem_.classList.remove("jpopout-parent");
+        this_.#popoutCount--;
         popoutOptions.onClosed?.();
       })();
     }

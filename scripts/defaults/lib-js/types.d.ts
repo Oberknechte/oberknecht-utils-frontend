@@ -23,6 +23,7 @@ export type popoutOptionsType = {
     parentElem?: HTMLElement;
     exitIconURL?: string;
     parentOptions?: elementOptions;
+    reuseOpenedPopout?: boolean;
     zIndex?: number;
     onClose?: Function;
     onClosed?: Function;

@@ -10,11 +10,13 @@ export declare class functions {
     static parseIconURL: (u: string, size?: string) => string;
 }
 export declare class elements {
+    #private;
     static createElement: <K extends string>(tagName: string | K, options?: elementOptions) => K extends keyof HTMLElementTagNameMap ? HTMLElementTagNameMap[K] : HTMLElement;
     static parseLinks: (elemOrQuery: getElementType, target?: string, useMarkdownLinks?: boolean) => void;
     static parseADHD: (elemOrQuery: HTMLElement | string, boldLength?: number, noIgnoreLinks?: boolean, ignoreCheck?: Function) => void;
     static parseJSONText: (s: string | Record<string, any>) => string;
-    static popout: (popoutOptions: popoutOptionsType) => jPopoutType;
+    static get getPopoutCount(): number;
+    static popout: (popoutOptions?: popoutOptionsType) => jPopoutType;
 }
 export declare class elementModifiers {
     static tempClass: (elem: getElementType, classNames: string | string[], duration?: number) => Promise<void>;
