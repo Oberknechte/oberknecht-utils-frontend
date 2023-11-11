@@ -95,7 +95,7 @@ class functions {
         }
         navigator.clipboard.writeText(copyData);
         if (!withoutAnimation && elemOrData instanceof HTMLElement) {
-            let animationParent = functions.getParent(elemOrData, copyOptions.animationParentsNum ?? 1) ??
+            let animationParent = functions.getParent(elemOrData, copyOptions.animationParentsNum ?? 0) ??
                 elemOrData;
             let animationDuration = copyOptions.animationDuration ?? 3000;
             await elementModifiers.tempClass(animationParent, ["jcopied-enable"], 300);

@@ -117,7 +117,7 @@ export class functions {
 
     if (!withoutAnimation && elemOrData instanceof HTMLElement) {
       let animationParent =
-        functions.getParent(elemOrData, copyOptions.animationParentsNum ?? 1) ??
+        functions.getParent(elemOrData, copyOptions.animationParentsNum ?? 0) ??
         elemOrData;
 
       let animationDuration = copyOptions.animationDuration ?? 3000;
@@ -133,7 +133,11 @@ export class functions {
         animationDuration
       );
 
-      await elementModifiers.tempClass(animationParent, ["jcopied-disable"], 500);
+      await elementModifiers.tempClass(
+        animationParent,
+        ["jcopied-disable"],
+        500
+      );
     }
   };
 }
