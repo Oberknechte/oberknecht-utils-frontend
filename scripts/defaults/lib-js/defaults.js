@@ -218,6 +218,10 @@ class elements {
         }
         if (popoutOptions.parentOptions)
             functions.appendElementOptions(parentElem_, popoutOptions.parentOptions);
+        if (popoutOptions.popoutElemOptions)
+            functions.appendElementOptions(popoutWindow, popoutOptions.popoutElemOptions);
+        if (popoutOptions.popoutBGElemOptions)
+            functions.appendElementOptions(popoutWindowBackground, popoutOptions.popoutBGElemOptions);
         parentElem_.classList.add("jpopout-parent");
         popoutWindow = popoutWindow ?? parentElem_.querySelector("jpopout");
         popoutWindowBackground =

@@ -26,6 +26,8 @@ export type popoutOptionsType = {
     innerElems?: elemType | elemType[];
     parentElem?: HTMLElement;
     parentElemOptions?: elementOptions;
+    popoutElemOptions?: elementOptions;
+    popoutBGElemOptions?: elementOptions;
     exitIconURL?: string;
     parentOptions?: elementOptions;
     reuseOpenedPopout?: boolean;
