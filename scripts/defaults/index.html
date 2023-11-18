@@ -6,7 +6,7 @@
     <title>Document</title>
     <!-- <link href="http://127.0.0.1:5500/scripts/jchoose/browser/jchoose.css" rel="stylesheet"> -->
     <!-- <link href="http://127.0.0.1:8080/mnt/dat/Programming/oberknecht-utils-frontend/scripts/defaults/styles/jPopout.css" rel="stylesheet"/> -->
-    <link href="http://127.0.0.1:8080/mnt/dat/Programming/oberknecht-utils-frontend/scripts/defaults/styles/jNotification.css" rel="stylesheet"/>
+    <link href="http://127.0.0.1:8081/mnt/dat/Programming/oberknecht-utils-frontend/scripts/defaults/styles/jNotification.css" rel="stylesheet"/>
   </head>
   <body>
     <div>
@@ -21,19 +21,11 @@
     <!-- <button onclick="functions.copy('test')">copy</button> -->
   </body>
 </html>
-<script src="http://127.0.0.1:8080/mnt/dat/Programming/oberknecht-utils-frontend/scripts/defaults/lib-js/defaults.bundle.js"></script>
+<script src="http://127.0.0.1:8081/mnt/dat/Programming/oberknecht-utils-frontend/scripts/defaults/lib-js/defaults.bundle.js"></script>
 <script>
   // elements.popout({ title: "test" });
   // elements.popout({ title: "test2" });
   // functions.copy('test')
-  elements.notification("test\ndest\nasd", {
-    noRemoveAfterClose: true,
-    noRemoveContainerAfterClose: true
-  });
-  elements.notification(Error("test"), {
-    noRemoveAfterClose: true,
-    noRemoveContainerAfterClose: true
-  });
 </script>
 
 <style>

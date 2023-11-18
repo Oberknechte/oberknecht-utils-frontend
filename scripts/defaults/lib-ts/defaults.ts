@@ -299,6 +299,12 @@ export class elements {
 
       parentElem_.appendChild(popoutWindow);
     }
+
+    if (popoutOptions.parentElemOptions)
+      functions.appendElementOptions(
+        parentElem_,
+        popoutOptions.parentElemOptions
+      );
     if (
       !parentElem_.querySelector("jpopoutbg") ||
       !popoutOptions.reuseOpenedPopout
