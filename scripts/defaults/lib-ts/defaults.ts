@@ -59,6 +59,12 @@ export class functions {
           break;
         }
 
+        case "parentElem":
+        case "pe": {
+          functions.getElement(options[optionName]).appendChild(element);
+          break;
+        }
+
         default: {
           // @ts-ignore
           if (options[optionName]) element[optionName] = options[optionName];

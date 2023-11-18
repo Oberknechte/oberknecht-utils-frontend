@@ -1,6 +1,6 @@
 {
   "name": "oberknecht-utils-frontend",
-  "version": "0.2.9",
+  "version": "0.3.0",
   "description": "",
   "main": "",
   "scripts": {
@@ -22,6 +22,7 @@
     "oberknecht-utils": "^1.8.1"
   },
   "devDependencies": {
+    "css-loader": "^6.8.1",
     "ts-loader": "^9.5.0",
     "typescript": "^5.2.2"
   }
