@@ -45,6 +45,7 @@ export type popoutOptionsType = {
   noRemoveAfterClose?: boolean;
   onClose?: Function;
   onClosed?: Function;
+  noAppendParentClass?: boolean;
 };
 
 export type copyOptionsType = {

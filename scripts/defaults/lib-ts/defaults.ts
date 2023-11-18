@@ -331,7 +331,13 @@ export class elements {
         popoutOptions.popoutBGElemOptions
       );
 
-    parentElem_.classList.add("jpopout-parent");
+    if (
+      !(
+        popoutOptions.noAppendParentClass ??
+        functions.options.popoutOptions.noAppendParentClass
+      )
+    )
+      parentElem_.classList.add("jpopout-parent");
 
     popoutWindow = popoutWindow ?? parentElem_.querySelector("jpopout");
     popoutWindowBackground =
