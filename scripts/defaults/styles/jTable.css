@@ -1,0 +1,46 @@
+:root {
+    --color-background-table: #1d2d44;
+    /* --color-background-table-td: #22577a;
+    --color-background-table-th: #38a3a5; */
+    --color-background-table-td: #38a3a5;
+    --color-background-table-th: #57cc99;
+
+    --color-dark: #0d1321;
+
+    --border-width: 1px;
+    --border-color: #f1faee75;
+
+    --border-width-td: var(--border-width);
+    /* --border-color-td: var(--border-color); */
+    --border-color-td: transparent;
+
+}
+
+.jTable {
+    width: 99%;
+    /* border: var(--border-width) solid var(--border-color); */
+    /* background-color: var(--color-background-table); */
+    /* color: var(--color-dark); */
+    color: var(--color-white);
+}
+
+.jTable-td {
+    background-color: var(--color-background-table-td);
+}
+
+.jTable-th {
+    font-weight: bold;
+    background-color: var(--color-background-table-th);
+}
+
+.jTable-th,
+.jTable-td {
+    border: var(--border-width-td) solid var(--border-color-td);
+}
+
+
+.jTable-empty {
+    border: none;
+    /* background-color: transparent; */
+    background-color: inherit;
+}

@@ -61,6 +61,11 @@ class functions {
             return elemOrQuery;
         return document.querySelector(elemOrQuery);
     };
+    static getElements = (elemsOrQuerys) => {
+        if (!this.checkBrowser())
+            throw Error("Not in browser");
+        return (0, utils_1.convertToArray)(elemsOrQuerys, false, true).map((a) => this.getElement(a));
+    };
     static parseIconURL = (u, size) => {
         let u_ = new URL(u.startsWith("/") ? this.url.origin + u : u);
         if (this.version)
@@ -104,6 +109,9 @@ class functions {
             await elementModifiers.tempClass(animationParent, ["jcopied"], animationDuration);
             await elementModifiers.tempClass(animationParent, ["jcopied-disable"], 500);
         }
+    };
+    static isHTMLElement = (elem) => {
+        return elem instanceof HTMLElement;
     };
 }
 exports.functions = functions;
@@ -399,36 +407,192 @@ class elements {
             });
         });
     };
+    static createTable = (tableOptions) => {
+        let tableOptions_ = {
+            names: tableOptions.names ?? [],
+            keys: tableOptions.keys ?? [],
+            tableName: tableOptions.tableName ?? "jTable",
+            noClearTable: tableOptions.noClearTable ?? false,
+            pe: tableOptions.parentElem ?? tableOptions.pe ?? undefined,
+            noSort: tableOptions.noSort ?? false,
+            noSortAfter: tableOptions.noSortAfter ?? false,
+            noCopy: tableOptions.noCopy ?? false,
+            sortAfterOptions: {
+                tdNum: tableOptions.sortAfterOptions?.tdNum ?? 0,
+                sortMode: tableOptions.sortAfterOptions?.sortMode ?? 1,
+            },
+            nameClasses: tableOptions.nameClasses ?? [],
+            search: tableOptions.search ?? false,
+        };
+        let tableID = tableOptions_.tableName;
+        let nameClasses_ = [tableID, ...(0, utils_1.convertToArray)(tableOptions_.nameClasses)];
+        let tableExists = (document.getElementById(tableID) ?? undefined) !== undefined;
+        let tableElem = document.getElementById(tableID) ??
+            elements.createElement("table");
+        tableElem.id = tableID;
+        if (!tableExists) {
+            tableElem.classList.add("jTable", tableID);
+            let thtr = elements.createElement("tr");
+            tableOptions_.names.forEach((name, i) => {
+                let th = elements.createElement("th");
+                th.classList.add("jTable-th", `${tableID}-th`, `${tableID}-th_${i}`);
+                th.innerText = name;
+                if (name.toString().length === 0)
+                    th.classList.add("jTable-empty");
+                if (!tableOptions_.noSort || name.toString().length === 0) {
+                    th.classList.add("cursor-sort");
+                    th.onclick = () => {
+                        let lastSortIndex = tableElem.getAttribute("sortThIndex");
+                        let lastSortMode = tableElem.getAttribute("sortMode");
+                        let lastSortMode_ = !lastSortIndex || lastSortIndex !== `${i}`
+                            ? 0
+                            : parseInt(lastSortMode);
+                        let sortMode = [1, 2, 1].at(lastSortMode_);
+                        this.sortTable(tableElem, i, sortMode, true);
+                        tableElem.setAttribute("sortThIndex", i.toString());
+                        tableElem.setAttribute("sortMode", sortMode.toString());
+                    };
+                }
+                thtr.appendChild(th);
+            });
+            if (tableOptions_.names.length > 0)
+                tableElem.appendChild(thtr);
+        }
+        if (tableExists && !tableOptions_.noClearTable)
+            [...tableElem.childNodes]
+                .filter(
+            // @ts-ignore
+            (a) => a.tagName == "TR" && [...a.childNodes][0].tagName == "TD")
+                .map((a) => a.remove());
+        let currentTR;
+        let currentTRNum = 0;
+        newTR();
+        function newTR() {
+            if (currentTR)
+                tableElem.appendChild(currentTR);
+            currentTR = elements.createElement("tr");
+            currentTR.classList.add("jTable-tr", `jTable-tr_${currentTRNum}`, ...nameClasses_.map((a) => `${a}-tr`), ...nameClasses_.map((a) => `${a}-tr_${currentTRNum}`));
+            currentTRNum++;
+        }
+        let tdBefore = [];
+        tableOptions_.keys.map((key, i) => {
+            tdBefore.push(i);
+            let tdNum = tdBefore.length - 1;
+            let key_ = functions.isHTMLElement(key) ? [key] : (0, utils_1.convertToArray)(key);
+            let skipKey = false;
+            let td = elements.createElement("td");
+            td.classList.add("jTable-td", `jTable-td_${tdNum}`, ...nameClasses_.map((a) => `${a}-td`), ...nameClasses_.map((a) => `${a}-td_${tdNum}`), `jTable-tr_${currentTRNum}`, `jTable-tr_${currentTRNum}-td_${tdNum}`, ...nameClasses_.map((a) => `${a}-tr_${currentTRNum}-td_${tdNum}`));
+            switch (key_[0]) {
+                case "@th": {
+                    td.classList.add("jTable-th", ...nameClasses_.map((a) => `${a}-th`));
+                    key_.splice(0, 1);
+                    td.innerText = key_?.join(" ");
+                    break;
+                }
+                case "\n": {
+                    newTR();
+                    skipKey = true;
+                    break;
+                }
+                default: {
+                    key_.forEach((a) => {
+                        if (functions.isHTMLElement(a)) {
+                            appendTD();
+                            return td.appendChild(a);
+                        }
+                        td.innerText = key_?.join(" ");
+                        if (!tableOptions_.noCopy) {
+                            td.classList.add("jcopy");
+                            td.onclick = () => {
+                                functions.copy(td);
+                            };
+                        }
+                    });
+                    break;
+                }
+            }
+            function appendTD() {
+                currentTR.appendChild(td);
+            }
+            if (key_.length === 0)
+                td.classList.add("jTable-empty", ...nameClasses_.map((a) => `${a}-empty`));
+            if (skipKey)
+                return (tdBefore = []);
+            appendTD();
+        });
+        tableElem.appendChild(currentTR);
+        if (tableOptions_.pe)
+            functions.getElement(tableOptions_.pe).appendChild(tableElem);
+        if (!tableOptions_.noSortAfter)
+            this.sortTable(tableElem, tableOptions_.sortAfterOptions.tdNum, tableOptions_.sortAfterOptions.sortMode);
+        return tableElem;
+    };
+    static sortTable = (table, tdNum, sortMode, reverseIfSame) => {
+        tdNum = tdNum ?? 0;
+        sortMode = sortMode ?? 1;
+        let trs = [...table.childNodes].slice(1);
+        const trs_ = [...trs];
+        trs.forEach((a) => a.remove());
+        let allNumbers = true;
+        let trSorted = trs
+            .map((a, i) => {
+            // @ts-ignore
+            if (!a.childNodes[tdNum]?.innerText)
+                return;
+            // @ts-ignore
+            let val = a.childNodes[tdNum].innerText.replace(/\t|\s|\n/g, "");
+            let isNum = regex_js_1.regex.numregex().test(val);
+            if (!isNum)
+                allNumbers = false;
+            return [isNum ? parseInt(val) : val.toLowerCase(), a];
+        })
+            .filter((a) => a !== undefined);
+        if (allNumbers)
+            trSorted.sort((a, b) => a[0] - b[0]);
+        else
+            trSorted.sort();
+        if (sortMode === 2 || (trSorted.map((a) => a[1]) === trs_ && reverseIfSame))
+            trSorted = trSorted.reverse();
+        trSorted.forEach((a) => table.appendChild(a[1]));
+    };
 }
 exports.elements = elements;
 class elementModifiers {
     static tempClass = (elem, classNames, duration, neverResolveOnForever) => {
-        return new Promise((resolve) => {
-            let elem_ = functions.getElement(elem);
-            let classNames_ = (0, utils_1.convertToArray)(classNames, false);
-            classNames_ = classNames_.filter((a) => !elem_.classList.contains(a));
-            if (classNames_.length === 0)
-                return;
-            elem_.classList.add(...classNames_);
-            if (duration <= 0 || duration >= 2147483647) {
-                if (!neverResolveOnForever)
-                    return resolve();
-                return;
-            }
-            setTimeout(() => {
-                elem_.classList.remove(...classNames_);
-                resolve();
-            }, duration ?? 5000);
+        let elems_ = functions.getElements(elem);
+        let classNames_ = (0, utils_1.convertToArray)(classNames, false);
+        return Promise.all(elems_.map((elem_) => {
+            return new Promise((resolve) => {
+                classNames_ = classNames_.filter((a) => !elem_.classList.contains(a));
+                if (classNames_.length === 0)
+                    return;
+                elem_.classList.add(...classNames_);
+                if (duration <= 0 || duration >= 2147483647) {
+                    if (!neverResolveOnForever)
+                        return resolve();
+                    return;
+                }
+                setTimeout(() => {
+                    elem_.classList.remove(...classNames_);
+                    resolve();
+                }, duration ?? 5000);
+            });
+        }));
+    };
+    static tempErrorHighlight = (elems, duration) => {
+        (0, utils_1.convertToArray)(elems, false, true).forEach((elem) => {
+            this.tempClass(elem, ["error-highlight"], duration ?? 5000);
         });
     };
-    static tempErrorHighlight = (elem, duration) => {
-        this.tempClass(elem, ["error-highlight"], duration);
+    static disable = (elems) => {
+        (0, utils_1.convertToArray)(elems, false, true).forEach((elem) => {
+            elem.setAttribute("disabled", "");
+        });
     };
-    static disable = (elem) => {
-        elem.setAttribute("disabled", "");
-    };
-    static enable = (elem) => {
-        elem.removeAttribute("disabled");
+    static enable = (elems) => {
+        (0, utils_1.convertToArray)(elems, false, true).forEach((elem) => {
+            elem.removeAttribute("disabled");
+        });
     };
 }
 exports.elementModifiers = elementModifiers;

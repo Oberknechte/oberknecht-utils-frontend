@@ -57,3 +57,20 @@ export type notificationOptionsType = {
     noRemoveContainerAfterClose?: boolean;
     elementOptions?: elementOptions;
 };
+export type tableOptionsType = {
+    names: string[];
+    keys: string[];
+    tableName?: string;
+    noClearTable?: boolean;
+    parentElem?: getElementType;
+    pe?: getElementType;
+    noSort?: boolean;
+    noSortAfter?: boolean;
+    noCopy?: boolean;
+    sortAfterOptions?: {
+        tdNum?: number;
+        sortMode?: number;
+    };
+    nameClasses?: string[];
+    search?: boolean;
+};

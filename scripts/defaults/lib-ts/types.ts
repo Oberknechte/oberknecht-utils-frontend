@@ -70,5 +70,23 @@ export type notificationOptionsType = {
   notificationButtons?: HTMLElement | HTMLElement[];
   noRemoveAfterClose?: boolean;
   noRemoveContainerAfterClose?: boolean;
-  elementOptions?: elementOptions
+  elementOptions?: elementOptions;
+};
+
+export type tableOptionsType = {
+  names: string[];
+  keys: string[];
+  tableName?: string;
+  noClearTable?: boolean;
+  parentElem?: getElementType;
+  pe?: getElementType;
+  noSort?: boolean;
+  noSortAfter?: boolean;
+  noCopy?: boolean;
+  sortAfterOptions?: {
+    tdNum?: number;
+    sortMode?: number;
+  };
+  nameClasses?: string[];
+  search?: boolean;
 };

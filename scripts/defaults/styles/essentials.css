@@ -8,8 +8,12 @@ button {
   display: none !important;
 }
 
+.jcopy {
+  cursor: copy;
+}
+
 .jcopied {
-  background-color: var(--color-green);
+  background-color: var(--color-green) !important;
 }
 
 .jcopied-enable {
@@ -18,6 +22,10 @@ button {
 
 .jcopied-disable {
   animation: j-copy-disable 500ms;
+}
+
+.cursor-sort {
+  cursor: pointer;
 }
 
 @keyframes m-enable {

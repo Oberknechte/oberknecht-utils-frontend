@@ -1,6 +1,6 @@
 {
   "name": "oberknecht-utils-frontend",
-  "version": "0.3.3",
+  "version": "0.3.5",
   "description": "",
   "main": "",
   "scripts": {
@@ -23,7 +23,9 @@
   },
   "devDependencies": {
     "css-loader": "^6.8.1",
-    "ts-loader": "^9.5.0",
-    "typescript": "^5.2.2"
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.2.2",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4"
   }
 }
