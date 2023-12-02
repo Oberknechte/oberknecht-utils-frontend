@@ -361,7 +361,7 @@ export class elements {
     if (
       !(
         popoutOptions.noAppendParentClass ??
-        functions.options.popoutOptions.noAppendParentClass
+        functions?.options?.popoutOptions?.noAppendParentClass
       )
     )
       parentElem_.classList.add("jpopout-parent");
