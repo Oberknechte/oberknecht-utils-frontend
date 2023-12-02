@@ -29,11 +29,17 @@
   // elements.popout({ title: "test" });
   // elements.popout({ title: "test2" });
   elements.createTable({
-    names: ["test"],
+    names: ["test", "test2"],
     keys: [
       elements.createElement("h", {
         attributes: {
           dest: "a",
+        },
+        innerText: "test2",
+      }),
+      elements.createElement("h", {
+        attributes: {
+          asd: "b",
         },
         innerText: "test2",
       }),
@@ -42,12 +48,18 @@
         attributes: {
           dest: "b",
         },
-        innerText: "test",
+        innerText: "test3",
+      }),
+      elements.createElement("h", {
+        attributes: {
+          asd: "a",
+        },
+        innerText: "test4",
       }),
     ],
     pe: "body",
     sortOptions: {
-      sortAttributeName: "dest"
+      sortAttributeNames: ["dest", "asd"]
     }
   });
 

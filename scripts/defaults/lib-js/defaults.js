@@ -456,7 +456,7 @@ class elements {
                             tdNum: i,
                             sortMode: sortMode,
                             reverseIfSame: true,
-                            ...tableOptions_.sortOptions
+                            ...tableOptions_.sortOptions,
                         });
                         tableElem.setAttribute("sortThIndex", i.toString());
                         tableElem.setAttribute("sortMode", sortMode.toString());
@@ -544,7 +544,7 @@ class elements {
             return;
         let tdNum = options.tdNum ?? 0;
         let sortMode = options.sortMode ?? 1;
-        let sortAttributeName = options.sortAttributeName;
+        let sortAttributeNames = options.sortAttributeNames;
         let trs = [...options.table.childNodes].slice(1);
         const trs_ = [...trs];
         trs.forEach((a) => a.remove());
@@ -554,6 +554,7 @@ class elements {
             // @ts-ignore
             if (!a.childNodes[tdNum]?.innerText)
                 return;
+            let sortAttributeName = sortAttributeNames?.[tdNum];
             let val = sortAttributeName
                 ? // @ts-ignore
                     a.childNodes[tdNum].firstChild.getAttribute(sortAttributeName)

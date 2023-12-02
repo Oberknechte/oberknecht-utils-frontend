@@ -76,5 +76,5 @@ export type sortTableOptionsType = {
     tdNum?: number;
     sortMode?: number | 1 | 2;
     reverseIfSame?: boolean;
-    sortAttributeName?: string;
+    sortAttributeNames?: string;
 };

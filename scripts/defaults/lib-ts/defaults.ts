@@ -667,7 +667,7 @@ export class elements {
               tdNum: i,
               sortMode: sortMode,
               reverseIfSame: true,
-              ...tableOptions_.sortOptions
+              ...tableOptions_.sortOptions,
             });
             tableElem.setAttribute("sortThIndex", i.toString());
             tableElem.setAttribute("sortMode", sortMode.toString());
@@ -788,7 +788,7 @@ export class elements {
     if (!options?.table) return;
     let tdNum = options.tdNum ?? 0;
     let sortMode = options.sortMode ?? 1;
-    let sortAttributeName = options.sortAttributeName;
+    let sortAttributeNames = options.sortAttributeNames;
 
     let trs = [...options.table.childNodes].slice(1);
     const trs_ = [...trs];
@@ -797,9 +797,10 @@ export class elements {
 
     let allNumbers = true;
     let trSorted = trs
-    .map((a, i) => {
-      // @ts-ignore
-      if (!a.childNodes[tdNum]?.innerText) return;
+      .map((a, i) => {
+        // @ts-ignore
+        if (!a.childNodes[tdNum]?.innerText) return;
+        let sortAttributeName = sortAttributeNames?.[tdNum];
         let val = sortAttributeName
           ? // @ts-ignore
             a.childNodes[tdNum].firstChild.getAttribute(sortAttributeName)
