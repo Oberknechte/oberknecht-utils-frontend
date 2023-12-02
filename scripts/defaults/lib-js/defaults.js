@@ -35,6 +35,12 @@ class functions {
                     functions.getElement(options[optionName]).appendChild(element);
                     break;
                 }
+                case "attributes": {
+                    Object.keys(options[optionName]).forEach((attributeName) => {
+                        element.setAttribute(attributeName, options[optionName][attributeName]);
+                    });
+                    break;
+                }
                 default: {
                     // @ts-ignore
                     if (options[optionName])
@@ -417,10 +423,7 @@ class elements {
             noSort: tableOptions.noSort ?? false,
             noSortAfter: tableOptions.noSortAfter ?? false,
             noCopy: tableOptions.noCopy ?? false,
-            sortAfterOptions: {
-                tdNum: tableOptions.sortAfterOptions?.tdNum ?? 0,
-                sortMode: tableOptions.sortAfterOptions?.sortMode ?? 1,
-            },
+            sortOptions: tableOptions.sortOptions,
             nameClasses: tableOptions.nameClasses ?? [],
             search: tableOptions.search ?? false,
         };
@@ -448,7 +451,13 @@ class elements {
                             ? 0
                             : parseInt(lastSortMode);
                         let sortMode = [1, 2, 1].at(lastSortMode_);
-                        this.sortTable(tableElem, i, sortMode, true);
+                        this.sortTable({
+                            table: tableElem,
+                            tdNum: i,
+                            sortMode: sortMode,
+                            reverseIfSame: true,
+                            ...tableOptions_.sortOptions
+                        });
                         tableElem.setAttribute("sortThIndex", i.toString());
                         tableElem.setAttribute("sortMode", sortMode.toString());
                     };
@@ -524,13 +533,19 @@ class elements {
         if (tableOptions_.pe)
             functions.getElement(tableOptions_.pe).appendChild(tableElem);
         if (!tableOptions_.noSortAfter)
-            this.sortTable(tableElem, tableOptions_.sortAfterOptions.tdNum, tableOptions_.sortAfterOptions.sortMode);
+            this.sortTable({
+                table: tableElem,
+                ...tableOptions_.sortOptions,
+            });
         return tableElem;
     };
-    static sortTable = (table, tdNum, sortMode, reverseIfSame) => {
-        tdNum = tdNum ?? 0;
-        sortMode = sortMode ?? 1;
-        let trs = [...table.childNodes].slice(1);
+    static sortTable = (options) => {
+        if (!options?.table)
+            return;
+        let tdNum = options.tdNum ?? 0;
+        let sortMode = options.sortMode ?? 1;
+        let sortAttributeName = options.sortAttributeName;
+        let trs = [...options.table.childNodes].slice(1);
         const trs_ = [...trs];
         trs.forEach((a) => a.remove());
         let allNumbers = true;
@@ -539,8 +554,11 @@ class elements {
             // @ts-ignore
             if (!a.childNodes[tdNum]?.innerText)
                 return;
-            // @ts-ignore
-            let val = a.childNodes[tdNum].innerText.replace(/\t|\s|\n/g, "");
+            let val = sortAttributeName
+                ? // @ts-ignore
+                    a.childNodes[tdNum].firstChild.getAttribute(sortAttributeName)
+                : // @ts-ignore
+                    a.childNodes[tdNum].innerText.replace(/\t|\s|\n/g, "");
             let isNum = regex_js_1.regex.numregex().test(val);
             if (!isNum)
                 allNumbers = false;
@@ -551,9 +569,10 @@ class elements {
             trSorted.sort((a, b) => a[0] - b[0]);
         else
             trSorted.sort();
-        if (sortMode === 2 || (trSorted.map((a) => a[1]) === trs_ && reverseIfSame))
+        if (sortMode === 2 ||
+            (trSorted.map((a) => a[1]) === trs_ && options.reverseIfSame))
             trSorted = trSorted.reverse();
-        trSorted.forEach((a) => table.appendChild(a[1]));
+        trSorted.forEach((a) => options.table.appendChild(a[1]));
     };
 }
 exports.elements = elements;

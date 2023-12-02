@@ -1,4 +1,4 @@
-import { copyOptionsType, elemType, elementOptions, functionsSettingsType, getElementType, jPopoutType, notificationOptionsType, popoutOptionsType, tableOptionsType, version } from "./types";
+import { copyOptionsType, elemType, elementOptions, functionsSettingsType, getElementType, jPopoutType, notificationOptionsType, popoutOptionsType, sortTableOptionsType, tableOptionsType, version } from "./types";
 export declare class functions {
     static url: URL;
     static version: version;
@@ -24,7 +24,7 @@ export declare class elements {
     static popout: (popoutOptions_?: popoutOptionsType) => jPopoutType;
     static notification: (dat: string | Error | any, notificationOptions_?: notificationOptionsType) => void;
     static createTable: (tableOptions: tableOptionsType) => HTMLTableElement;
-    static sortTable: (table: HTMLTableElement, tdNum?: number, sortMode?: number | 1 | 2, reverseIfSame?: boolean) => void;
+    static sortTable: (options: sortTableOptionsType) => void;
 }
 export declare class elementModifiers {
     static tempClass: (elem: getElementType | getElementType[], classNames: string | string[], duration?: number, neverResolveOnForever?: boolean) => Promise<void[]>;

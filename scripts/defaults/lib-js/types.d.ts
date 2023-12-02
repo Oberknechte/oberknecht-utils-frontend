@@ -67,10 +67,14 @@ export type tableOptionsType = {
     noSort?: boolean;
     noSortAfter?: boolean;
     noCopy?: boolean;
-    sortAfterOptions?: {
-        tdNum?: number;
-        sortMode?: number;
-    };
+    sortOptions?: sortTableOptionsType;
     nameClasses?: string[];
     search?: boolean;
+};
+export type sortTableOptionsType = {
+    table: HTMLTableElement;
+    tdNum?: number;
+    sortMode?: number | 1 | 2;
+    reverseIfSame?: boolean;
+    sortAttributeName?: string;
 };
