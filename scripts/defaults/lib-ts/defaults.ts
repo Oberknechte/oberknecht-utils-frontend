@@ -670,7 +670,9 @@ export class elements {
               ...getValuesFromObject(tableOptions_.sortOptions, ["sortAttributeNames"]),
             });
             function getValuesFromObject(o, keys) {
-              return keys.map(a => o[a])
+              let r = {};
+              keys.forEach(a => r[a] = o[a])
+              return r;
             }
             tableElem.setAttribute("sortThIndex", i.toString());
             tableElem.setAttribute("sortMode", sortMode.toString());
@@ -808,6 +810,7 @@ export class elements {
           return;
         };
         let sortAttributeName = sortAttributeNames?.[tdNum];
+        console.log(sortAttributeName)
         let val = sortAttributeName
           ? // @ts-ignore
             a.childNodes[tdNum].firstChild.getAttribute(sortAttributeName)
