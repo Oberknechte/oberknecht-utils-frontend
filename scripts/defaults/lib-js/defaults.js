@@ -564,7 +564,6 @@ class elements {
             }
             ;
             let sortAttributeName = sortAttributeNames?.[tdNum];
-            console.log(sortAttributeName);
             let val = sortAttributeName
                 ? // @ts-ignore
                     a.childNodes[tdNum].firstChild.getAttribute(sortAttributeName)
