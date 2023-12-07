@@ -456,8 +456,11 @@ class elements {
                             tdNum: i,
                             sortMode: sortMode,
                             reverseIfSame: true,
-                            // ...tableOptions_.sortOptions,
+                            ...getValuesFromObject(tableOptions_.sortOptions, ["sortAttributeNames"]),
                         });
+                        function getValuesFromObject(o, keys) {
+                            return keys.map(a => o[a]);
+                        }
                         tableElem.setAttribute("sortThIndex", i.toString());
                         tableElem.setAttribute("sortMode", sortMode.toString());
                     };
@@ -547,13 +550,17 @@ class elements {
         let sortAttributeNames = options.sortAttributeNames;
         let trs = [...options.table.childNodes].slice(1);
         const trs_ = [...trs];
+        let trsLast = [];
         trs.forEach((a) => a.remove());
         let allNumbers = true;
         let trSorted = trs
             .map((a, i) => {
             // @ts-ignore
-            if (!a.childNodes[tdNum]?.innerText)
+            if (!a.childNodes[tdNum]?.innerText) {
+                trsLast.push([undefined, a]);
                 return;
+            }
+            ;
             let sortAttributeName = sortAttributeNames?.[tdNum];
             let val = sortAttributeName
                 ? // @ts-ignore
@@ -565,13 +572,15 @@ class elements {
                 allNumbers = false;
             return [isNum ? parseInt(val) : val.toLowerCase(), a];
         })
-            .filter((a) => a !== undefined);
+            .filter((a) => a);
         if (allNumbers)
             trSorted.sort((a, b) => a[0] - b[0]);
         else
             trSorted.sort();
+        const trSorted_ = [...trSorted];
+        trSorted = [...trSorted, ...trsLast];
         if (sortMode === 2 ||
-            (trSorted.map((a) => a[1]) === trs_ && options.reverseIfSame))
+            (trSorted_.map((a) => a[1]) === trs_ && options.reverseIfSame))
             trSorted = trSorted.reverse();
         trSorted.forEach((a) => options.table.appendChild(a[1]));
     };
