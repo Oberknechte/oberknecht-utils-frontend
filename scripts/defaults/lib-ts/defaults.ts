@@ -667,7 +667,7 @@ export class elements {
               tdNum: i,
               sortMode: sortMode,
               reverseIfSame: true,
-              ...tableOptions_.sortOptions,
+              // ...tableOptions_.sortOptions,
             });
             tableElem.setAttribute("sortThIndex", i.toString());
             tableElem.setAttribute("sortMode", sortMode.toString());

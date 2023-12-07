@@ -35,13 +35,14 @@
         attributes: {
           dest: "a",
         },
-        innerText: "test2",
+        innerText: "test1.1",
       }),
+      "test1.2",
       elements.createElement("h", {
         attributes: {
           asd: "b",
         },
-        innerText: "test2",
+        innerText: "test1.3",
       }),
       "\n",
       elements.createElement("h", {
@@ -59,7 +60,9 @@
     ],
     pe: "body",
     sortOptions: {
-      sortAttributeNames: ["dest", "asd"]
+      sortAttributeNames: ["dest", undefined, "asd"],
+      tdNum: 0,
+      sortMode: 2
     }
   });
 
