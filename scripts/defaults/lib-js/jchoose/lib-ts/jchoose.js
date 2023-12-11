@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.jChoose = void 0;
-const defaults_1 = require("./jchoose/lib-ts/defaults");
+const defaults_1 = require("./defaults");
 const convertToArray_js_1 = require("oberknecht-utils/lib-js/utils/arrayModifiers/convertToArray.js");
 const arrayModifiers_js_1 = require("oberknecht-utils/lib-js/utils/arrayModifiers.js");
 const isNullUndefined_js_1 = require("oberknecht-utils/lib-js/utils/isNullUndefined.js");
-const defaults_2 = require("./defaults/lib-ts/defaults");
+const defaults_2 = require("../../defaults/lib-ts/defaults");
 let jChooseNum = 0;
 class jChoose {
     #sym = `jChoose-${jChooseNum++}`;
