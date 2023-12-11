@@ -28,6 +28,7 @@ import {
   timeUnitInputOptionsType,
   version,
 } from "./types";
+import { jChoose } from "../../jchoose/lib-ts/jchoose";
 const timeUnits = [
   ["s", "second", 1000],
   ["m", "minute", 60 * 1000],
@@ -722,8 +723,10 @@ export class elements {
   };
 
   static closeNotificationsAll = () => {
-    document.querySelectorAll("jnotification").forEach(a => this.closeNotification(a));
-  }
+    document
+      .querySelectorAll("jnotification")
+      .forEach((a) => this.closeNotification(a));
+  };
 
   static closeErrorNotification = () => {
     if (!this.#notificationOpened || !this.#isErrorNotification) return;
@@ -1051,6 +1054,8 @@ export class elements {
 
     return timeUnitInputContainer;
   };
+
+  static jChoose = jChoose;
 }
 
 export class elementModifiers {

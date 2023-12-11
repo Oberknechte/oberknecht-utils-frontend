@@ -3,11 +3,11 @@ const webpack = require("webpack");
 
 
 module.exports = {
-  entry: "./browser/jchoose.browser.ts",
+  entry: "./lib-ts/browser/jchoose.browser.ts",
   // mode: "production",
   mode: "development",
   output: {
-    path: path.resolve(__dirname, "./browser"),
+    path: path.resolve(__dirname, "./lib-js/browser"),
     filename: "jchoose.bundle.js",
     // path: "./browser/jchoose.bundle.js",
   },

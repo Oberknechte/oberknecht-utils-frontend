@@ -1,0 +1,144 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.jChoose = void 0;
+const defaults_1 = require("./jchoose/lib-ts/defaults");
+const convertToArray_js_1 = require("oberknecht-utils/lib-js/utils/arrayModifiers/convertToArray.js");
+const arrayModifiers_js_1 = require("oberknecht-utils/lib-js/utils/arrayModifiers.js");
+const isNullUndefined_js_1 = require("oberknecht-utils/lib-js/utils/isNullUndefined.js");
+const defaults_2 = require("./defaults/lib-ts/defaults");
+let jChooseNum = 0;
+class jChoose {
+    #sym = `jChoose-${jChooseNum++}`;
+    get symbol() {
+        return this.#sym;
+    }
+    #selectContainers;
+    #options;
+    #chooseOptions = [];
+    constructor() { }
+    choose = (options) => {
+        this.#options = options ?? {};
+        this.#selectContainers = [];
+        [
+            ...(0, convertToArray_js_1.convertToArray)(this.#options.appendSelectors, false),
+            ...defaults_1.defaultAppendClasses.map((a) => `.${a}`),
+        ].forEach((selector) => {
+            // @ts-ignore
+            this.#selectContainers.push(...(selector instanceof HTMLElement
+                ? [selector]
+                : document.querySelectorAll(selector)));
+        });
+        this.#selectContainers.forEach((a) => this.createChoose(a));
+    };
+    createChoose = (originalSelect) => {
+        let this_ = this;
+        if (!(originalSelect instanceof HTMLSelectElement))
+            return;
+        let chooseContainer = defaults_2.elements.createElement("div", {
+            classes: ["jChoose-container"],
+            id: `jChoose-${originalSelect.id}`,
+        });
+        let chooseSelected = defaults_2.elements.createElement("div", {
+            classes: ["jChoose-selected"],
+        });
+        let chooseInput = defaults_2.elements.createElement("input", {
+            placeholder: this.#options.placeholder,
+            classes: ["jChose-input"],
+        });
+        defaults_2.functions.appendChildren(chooseContainer, chooseSelected, chooseInput);
+        // @ts-ignore
+        [...originalSelect.querySelectorAll("option")].forEach((optionElem) => {
+            appendOption({
+                name: optionElem.innerText,
+                value: optionElem.value,
+                optionElem: optionElem,
+            });
+        });
+        function appendOption(optionOptions) {
+            if (optionOptions.value.length === 0 ||
+                (this_.#options.minLength &&
+                    optionOptions.value.length < this_.#options.minLength) ||
+                (this_.#options.maxLength &&
+                    optionOptions.value.length > this_.#options.maxLength) ||
+                (!this_.#options.allowDuplicates &&
+                    this_.#chooseOptions.some((a) => a.value === optionOptions.value)))
+                return;
+            if (this_.#options.addValidation &&
+                !this_.#options.addValidation(optionOptions.value))
+                return;
+            let chooseOptionContainer = defaults_2.elements.createElement("div", {
+                classes: ["jChoose-select"],
+            });
+            let chooseOptionContainerInner = defaults_2.elements.createElement("div", {
+                classes: ["jChoose-select-inner"],
+            });
+            let chooseOptionName = defaults_2.elements.createElement("h", {
+                classes: ["jChoose-select-name"],
+                innerText: optionOptions.name ?? optionOptions.value,
+            });
+            let chooseOptionDelete = defaults_2.elements.createElement("h", {
+                classes: ["jChoose-select-delete"],
+            });
+            if (optionOptions.name)
+                chooseOptionName.setAttribute("jChoose_name", optionOptions.name);
+            chooseOptionName.setAttribute("jChoose_value", optionOptions.value);
+            let chooseSelectOption = defaults_2.elements.createElement("option", {
+                innerText: optionOptions.name ?? optionOptions.value,
+                value: optionOptions.value,
+            });
+            let d = {
+                ...optionOptions,
+                elem: chooseOptionContainer,
+                optionElem: optionOptions.optionElem ?? chooseSelectOption,
+            };
+            this_.#chooseOptions.push(d);
+            chooseOptionDelete.onclick = () => {
+                removeOption(this_.#chooseOptions.indexOf(d));
+            };
+            defaults_2.functions.appendChildren(chooseOptionContainerInner, chooseOptionName, chooseOptionDelete);
+            defaults_2.functions.appendChildren(chooseOptionContainer, chooseOptionContainerInner);
+            defaults_2.functions.appendChildren(chooseSelected, chooseOptionContainer);
+            if (!optionOptions.optionElem)
+                defaults_2.functions.appendChildren(originalSelect, chooseSelectOption);
+        }
+        function removeOption(index) {
+            if (this_.#chooseOptions.length === 0)
+                return;
+            index = !(0, isNullUndefined_js_1.isNullUndefined)(index) ? index : this_.#chooseOptions.length - 1;
+            let optionOptions = this_.#chooseOptions[index];
+            this_.#chooseOptions = arrayModifiers_js_1.arrayModifiers.splice(this_.#chooseOptions, index, 1);
+            optionOptions.elem.remove();
+            optionOptions.optionElem.remove();
+            // arrayModifiers.splice(chooseOptionsSelected, index);
+        }
+        (() => {
+            let inputValue = "";
+            chooseInput.onkeydown = (ev) => {
+                inputValue = chooseInput.value;
+                if (this.#options.disallowedCharsRegExp)
+                    inputValue = inputValue.replace(this.#options.disallowedCharsRegExp, this.#options.disallowedCharsReplacement ?? "");
+                switch (ev.key) {
+                    case "Enter": {
+                        appendOption({
+                            value: inputValue,
+                        });
+                        chooseInput.value = "";
+                        break;
+                    }
+                    case "Backspace": {
+                        if (inputValue.length === 0)
+                            removeOption();
+                        break;
+                    }
+                }
+            };
+        })();
+        originalSelect.parentNode.appendChild(chooseContainer);
+        originalSelect.parentNode.insertBefore(originalSelect, chooseContainer);
+        originalSelect.style.display = "none";
+    };
+    values = () => {
+        return this.#chooseOptions.map((a) => a.value);
+    };
+}
+exports.jChoose = jChoose;

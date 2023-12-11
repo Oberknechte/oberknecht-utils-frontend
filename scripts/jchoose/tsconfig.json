@@ -1,0 +1,16 @@
+{
+    "include": [
+        "./lib-ts/jchoose.ts",
+    ],
+    "compilerOptions": {
+        "downlevelIteration": true,
+        "esModuleInterop": true,
+        "outDir": "./lib-js/",
+        "declaration": true,
+        "module": "NodeNext",
+        "target": "ESNext"
+    },
+    "watchOptions": {
+        "watchDirectory": "fixedpollinginterval"
+    }
+}

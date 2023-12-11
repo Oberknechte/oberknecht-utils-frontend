@@ -498,7 +498,9 @@ class elements {
         this.#notificationClosing = false;
     };
     static closeNotificationsAll = () => {
-        document.querySelectorAll("jnotification").forEach(a => this.closeNotification(a));
+        document
+            .querySelectorAll("jnotification")
+            .forEach((a) => this.closeNotification(a));
     };
     static closeErrorNotification = () => {
         if (!this.#notificationOpened || !this.#isErrorNotification)
@@ -657,7 +659,7 @@ class elements {
                 return;
             }
             let sortAttributeName = sortAttributeNames?.[tdNum];
-            let val = sortAttributeName
+            let val = sortAttributeName && a.childNodes[tdNum]?.firstChild
                 ? // @ts-ignore
                     a.childNodes[tdNum].firstChild.getAttribute(sortAttributeName)
                 : // @ts-ignore
