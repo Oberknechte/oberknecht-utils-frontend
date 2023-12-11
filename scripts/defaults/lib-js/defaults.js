@@ -4,6 +4,12 @@ exports.elementModifiers = exports.elements = exports.functions = void 0;
 const regex_js_1 = require("oberknecht-utils/lib-js/variables/regex.js");
 const utils_1 = require("oberknecht-utils/lib-js/utils");
 const types_1 = require("./types");
+const timeUnits = [
+    ["s", "second", 1000],
+    ["m", "minute", 60 * 1000],
+    ["h", "hour", 60 * 60 * 1000],
+    ["d", "day", 24 * 60 * 60 * 1000],
+];
 class functions {
     static url = new URL(document.baseURI);
     static version;
@@ -118,6 +124,55 @@ class functions {
     };
     static isHTMLElement = (elem) => {
         return elem instanceof HTMLElement;
+    };
+    static getUnitName = (value) => {
+        let selectedUnit;
+        (0, utils_1.recreate)(timeUnits)
+            .reverse()
+            .forEach((a) => {
+            let n2 = value / a[2];
+            if (n2 > 0 && n2.toString().length < 4)
+                selectedUnit = a;
+        });
+        selectedUnit = selectedUnit ?? timeUnits[0];
+        return {
+            unit: selectedUnit,
+            unitName: selectedUnit[0],
+            value: value / selectedUnit[2],
+        };
+    };
+    static getUnitNum = (unitName) => {
+        return timeUnits
+            .map((a, i) => [a, i])
+            .filter((a) => a[0][0] == this.getUnit(unitName)[0])[0]?.[1];
+    };
+    static getUnitByNum = (num) => {
+        return timeUnits[num];
+    };
+    static getUnit = (unit) => {
+        switch (typeof unit) {
+            case "number": {
+                return this.getUnitByNum(unit);
+            }
+            case "string": {
+                return this.getUnitByNum(this.getUnitNum(unit));
+            }
+        }
+        return unit;
+    };
+    static toNumber = (inp) => {
+        if (typeof inp === "string")
+            return parseInt(inp);
+        return inp;
+    };
+    static convertUnitToTime = (unit_, value) => {
+        let unit = this.getUnit(unit_);
+        return this.toNumber(value) * unit[2];
+    };
+    static undefinedOnEmptyString = (s) => {
+        if (s.length === 0)
+            return undefined;
+        return s;
     };
 }
 exports.functions = functions;
@@ -456,11 +511,13 @@ class elements {
                             tdNum: i,
                             sortMode: sortMode,
                             reverseIfSame: true,
-                            ...getValuesFromObject(tableOptions_.sortOptions, ["sortAttributeNames"]),
+                            ...getValuesFromObject(tableOptions_.sortOptions, [
+                                "sortAttributeNames",
+                            ]),
                         });
                         function getValuesFromObject(o, keys) {
                             let r = {};
-                            keys.forEach(a => r[a] = o[a]);
+                            keys.forEach((a) => (r[a] = o[a]));
                             return r;
                         }
                         tableElem.setAttribute("sortThIndex", i.toString());
@@ -562,7 +619,6 @@ class elements {
                 trsLast.push([undefined, a]);
                 return;
             }
-            ;
             let sortAttributeName = sortAttributeNames?.[tdNum];
             let val = sortAttributeName
                 ? // @ts-ignore
@@ -585,6 +641,83 @@ class elements {
             (trSorted_.map((a) => a[1]) === trs_ && options.reverseIfSame))
             trSorted = trSorted.reverse();
         trSorted.forEach((a) => options.table.appendChild(a[1]));
+    };
+    static timeUnitInput = (options) => {
+        if (!options)
+            return;
+        let { unit, value } = functions.getUnitName(options.value);
+        let selectedUnit = {
+            unit: unit,
+            value: value ?? 0,
+        };
+        let isMulti = (value ?? 1) === 1;
+        let timeUnitInputContainer = elements.createElement("div", {
+            classes: ["timeUnitInputContainer"],
+        });
+        let timeUnitInputNumber = elements.createElement("input", {
+            type: "number",
+            classes: ["timeUnitInputNumber"],
+            value: (value ?? 1).toString(),
+            min: (options.minValue ?? 0).toString(),
+        });
+        (() => {
+            timeUnitInputNumber.onchange = () => {
+                selectedUnit.value = parseInt(timeUnitInputNumber.value);
+                triggerCB();
+            };
+            if (value)
+                timeUnitInputNumber.value = value.toString();
+        })();
+        let timeUnitInputUnitSelect = elements.createElement("select", {
+            classes: ["timeUnitInputUnit"],
+        });
+        (() => {
+            updateUnits();
+            timeUnitInputUnitSelect.onchange = () => {
+                selectedUnit.unit = timeUnits[parseInt(timeUnitInputUnitSelect.value)];
+                triggerCB();
+            };
+            if (unit)
+                timeUnitInputUnitSelect.value = functions.getUnitNum(unit).toString();
+            triggerCB();
+        })();
+        function triggerCB() {
+            updateUnits();
+            if (!options.changeCallback)
+                return;
+            options.changeCallback(functions.convertUnitToTime(selectedUnit.unit, selectedUnit.value));
+        }
+        function appendTimeUnits(multi) {
+            let lastSelectedUnit = (functions.undefinedOnEmptyString(timeUnitInputUnitSelect.value) ??
+                unit ??
+                undefined).toString();
+            timeUnitInputUnitSelect.innerHTML = "";
+            timeUnits.forEach((timeUnit, i) => {
+                let timeUnitElem = elements.createElement("option", {
+                    innerText: timeUnit[1] + (multi ? "s" : ""),
+                    value: i.toString(),
+                });
+                timeUnitInputUnitSelect.appendChild(timeUnitElem);
+            });
+            if (lastSelectedUnit)
+                timeUnitInputUnitSelect.value = lastSelectedUnit;
+        }
+        function updateUnits() {
+            if (parseInt(timeUnitInputNumber.value) === 1) {
+                if (isMulti === false)
+                    return;
+                isMulti = false;
+                appendTimeUnits(false);
+            }
+            else {
+                if (isMulti === true)
+                    return;
+                isMulti = true;
+                appendTimeUnits(true);
+            }
+        }
+        [timeUnitInputNumber, timeUnitInputUnitSelect].forEach((a) => timeUnitInputContainer.appendChild(a));
+        return timeUnitInputContainer;
     };
 }
 exports.elements = elements;

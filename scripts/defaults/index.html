@@ -68,10 +68,18 @@
     sortOptions: {
       sortAttributeNames: ["dest", "asd"],
       tdNum: 0,
-      sortMode: 2
-    }
+      sortMode: 2,
+    },
   });
 
+  document.querySelector("body").appendChild(
+    elements.timeUnitInput({
+      value: undefined,
+      changeCallback: (r) => {
+        console.log("time change", r);
+      },
+    })
+  );
 
   // functions.copy('test')
 </script>

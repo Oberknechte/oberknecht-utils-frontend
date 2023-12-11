@@ -1,4 +1,4 @@
-import { copyOptionsType, elemType, elementOptions, functionsSettingsType, getElementType, jPopoutType, notificationOptionsType, popoutOptionsType, sortTableOptionsType, tableOptionsType, version } from "./types";
+import { copyOptionsType, elemType, elementOptions, functionsSettingsType, getElementType, jPopoutType, notificationOptionsType, popoutOptionsType, sortTableOptionsType, tableOptionsType, timeUnitInputOptionsType, version } from "./types";
 export declare class functions {
     static url: URL;
     static version: version;
@@ -12,6 +12,17 @@ export declare class functions {
     static parseIconURL: (u: string, size?: string) => string;
     static copy: (elemOrData: any, copyOptions_?: copyOptionsType) => Promise<void>;
     static isHTMLElement: (elem: any) => boolean;
+    static getUnitName: (value: number) => {
+        unit: any;
+        unitName: any;
+        value: number;
+    };
+    static getUnitNum: (unitName: string) => any;
+    static getUnitByNum: (num: number) => (string | number)[];
+    static getUnit: (unit: string) => any;
+    static toNumber: (inp: string | number) => number;
+    static convertUnitToTime: (unit_: string, value: string | number) => number;
+    static undefinedOnEmptyString: (s: string) => string;
 }
 export declare class elements {
     #private;
@@ -25,6 +36,7 @@ export declare class elements {
     static notification: (dat: string | Error | any, notificationOptions_?: notificationOptionsType) => void;
     static createTable: (tableOptions: tableOptionsType) => HTMLTableElement;
     static sortTable: (options: sortTableOptionsType) => void;
+    static timeUnitInput: (options: timeUnitInputOptionsType) => HTMLDivElement;
 }
 export declare class elementModifiers {
     static tempClass: (elem: getElementType | getElementType[], classNames: string | string[], duration?: number, neverResolveOnForever?: boolean) => Promise<void[]>;

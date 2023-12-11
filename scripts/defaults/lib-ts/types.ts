@@ -95,3 +95,9 @@ export type sortTableOptionsType = {
   reverseIfSame?: boolean;
   sortAttributeNames?: string;
 };
+
+export type timeUnitInputOptionsType = {
+  value: number;
+  changeCallback: Function;
+  minValue?: number;
+};
