@@ -34,6 +34,9 @@ export declare class elements {
     static get getPopoutCount(): number;
     static popout: (popoutOptions_?: popoutOptionsType) => jPopoutType;
     static notification: (dat: string | Error | any, notificationOptions_?: notificationOptionsType) => void;
+    static closeNotification: (notificationContainerElem?: elemType) => Promise<void>;
+    static closeNotificationsAll: () => void;
+    static closeErrorNotification: () => void;
     static createTable: (tableOptions: tableOptionsType) => HTMLTableElement;
     static sortTable: (options: sortTableOptionsType) => void;
     static timeUnitInput: (options: timeUnitInputOptionsType) => HTMLDivElement;

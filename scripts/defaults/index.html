@@ -72,14 +72,11 @@
     },
   });
 
-  document.querySelector("body").appendChild(
-    elements.timeUnitInput({
-      value: undefined,
-      changeCallback: (r) => {
-        console.log("time change", r);
-      },
-    })
-  );
+  elements.notification(Error("test"));
+  elements.notification(Error("test"));
+  setTimeout(() => {
+    elements.closeNotificationsAll();
+  }, 1000);
 
   // functions.copy('test')
 </script>

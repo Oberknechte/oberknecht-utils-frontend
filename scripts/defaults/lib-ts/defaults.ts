@@ -525,6 +525,10 @@ export class elements {
     return popoutWindow;
   };
 
+  static #notificationOpened = false;
+  static #notificationClosing = false;
+  static #isErrorNotification = false;
+  static #notificationChangingTimeout;
   static notification = (
     dat: string | Error | any,
     notificationOptions_?: notificationOptionsType
@@ -564,6 +568,11 @@ export class elements {
       ) as jNotificationType;
       notificationsContainerElem.appendChild(notificationElem);
     }
+
+    notificationElem.setAttribute(
+      "reuseopenednotification",
+      notificationOptions.reuseOpenedNotification ? "1" : "0"
+    );
 
     function getNotificationsCount() {
       return [...notificationsContainerElem.querySelectorAll("jnotification")]
@@ -677,6 +686,48 @@ export class elements {
         },
       });
     });
+  };
+
+  static closeNotification = async (notificationContainerElem?: elemType) => {
+    let notificationContainer = notificationContainerElem
+      ? functions.getElement(notificationContainerElem)
+      : document.querySelector("jnotification");
+    let notification = notificationContainer;
+
+    let reuseOpenedNotification =
+      notificationContainer.getAttribute("reuseopenednotification") === "1";
+
+    if (reuseOpenedNotification) {
+      if (!this.#notificationOpened) return;
+      this.#notificationClosing = true;
+      if (this.#notificationChangingTimeout)
+        clearTimeout(this.#notificationChangingTimeout);
+    }
+
+    notificationContainer.classList.remove("jNotificationOpen");
+    notificationContainer.classList.add("jNotificationClose");
+
+    await elementModifiers.tempClass(
+      notification,
+      ["jnotification-disable"],
+      250
+    );
+
+    notification.classList.add("dp-none");
+    notificationContainer.classList.add("bg-transparent");
+    notificationContainer.classList.remove("notification-error");
+    if (!reuseOpenedNotification) return;
+    this.#notificationOpened = false;
+    this.#notificationClosing = false;
+  };
+
+  static closeNotificationsAll = () => {
+    document.querySelectorAll("jnotification").forEach(a => this.closeNotification(a));
+  }
+
+  static closeErrorNotification = () => {
+    if (!this.#notificationOpened || !this.#isErrorNotification) return;
+    this.closeNotification();
   };
 
   static createTable = (tableOptions: tableOptionsType) => {
@@ -905,7 +956,7 @@ export class elements {
   };
 
   static timeUnitInput = (options: timeUnitInputOptionsType) => {
-    if(!options) return;
+    if (!options) return;
     let { unit, value } = functions.getUnitName(options.value);
     let selectedUnit = {
       unit: unit,

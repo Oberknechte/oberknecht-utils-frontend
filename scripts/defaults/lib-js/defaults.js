@@ -365,6 +365,10 @@ class elements {
         [popoutTop, popoutBottom].forEach((a) => popoutWindow.appendChild(a));
         return popoutWindow;
     };
+    static #notificationOpened = false;
+    static #notificationClosing = false;
+    static #isErrorNotification = false;
+    static #notificationChangingTimeout;
     static notification = (dat, notificationOptions_) => {
         let notificationOptions = (0, utils_1.concatJSON)([
             functions.options?.notificationOptions ?? {},
@@ -388,6 +392,7 @@ class elements {
             notificationElem = elements.createElement("jnotification");
             notificationsContainerElem.appendChild(notificationElem);
         }
+        notificationElem.setAttribute("reuseopenednotification", notificationOptions.reuseOpenedNotification ? "1" : "0");
         function getNotificationsCount() {
             return [...notificationsContainerElem.querySelectorAll("jnotification")]
                 .length;
@@ -467,6 +472,38 @@ class elements {
                 },
             });
         });
+    };
+    static closeNotification = async (notificationContainerElem) => {
+        let notificationContainer = notificationContainerElem
+            ? functions.getElement(notificationContainerElem)
+            : document.querySelector("jnotification");
+        let notification = notificationContainer;
+        let reuseOpenedNotification = notificationContainer.getAttribute("reuseopenednotification") === "1";
+        if (reuseOpenedNotification) {
+            if (!this.#notificationOpened)
+                return;
+            this.#notificationClosing = true;
+            if (this.#notificationChangingTimeout)
+                clearTimeout(this.#notificationChangingTimeout);
+        }
+        notificationContainer.classList.remove("jNotificationOpen");
+        notificationContainer.classList.add("jNotificationClose");
+        await elementModifiers.tempClass(notification, ["jnotification-disable"], 250);
+        notification.classList.add("dp-none");
+        notificationContainer.classList.add("bg-transparent");
+        notificationContainer.classList.remove("notification-error");
+        if (!reuseOpenedNotification)
+            return;
+        this.#notificationOpened = false;
+        this.#notificationClosing = false;
+    };
+    static closeNotificationsAll = () => {
+        document.querySelectorAll("jnotification").forEach(a => this.closeNotification(a));
+    };
+    static closeErrorNotification = () => {
+        if (!this.#notificationOpened || !this.#isErrorNotification)
+            return;
+        this.closeNotification();
     };
     static createTable = (tableOptions) => {
         let tableOptions_ = {
