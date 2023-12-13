@@ -7,7 +7,7 @@ module.exports = {
   // mode: "production",
   mode: "development",
   output: {
-    path: path.resolve(__dirname, "./lib-js/browser"),
+    path: path.resolve(__dirname, "./lib-ts/browser"),
     filename: "jchoose.bundle.js",
     // path: "./browser/jchoose.bundle.js",
   },

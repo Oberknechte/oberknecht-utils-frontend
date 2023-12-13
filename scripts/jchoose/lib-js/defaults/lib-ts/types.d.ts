@@ -2,26 +2,26 @@ export declare const defaultExitIconURL: "https://raw.githubusercontent.com/Ober
 export declare const defaultCopyAnimationDuration: 5000;
 export declare const defaultNotificationAnimationDuration: 5000;
 export declare const defaultNotificationErrorAnimationDuration: -1;
-export declare type elementOptionsExtra = {
+export type elementOptionsExtra = {
     classes?: string | string[];
     childNodes?: string | string[];
 };
-export declare type elementOptions = elementOptionsExtra & Record<string, any>;
-export declare type version = {
+export type elementOptions = elementOptionsExtra & Record<string, any>;
+export type version = {
     npm: string;
 };
-export declare type jPopoutType = HTMLElement & {
+export type jPopoutType = HTMLElement & {
     closePopout: () => {};
 };
-export declare type elemType = HTMLElement | Element;
-export declare type getElementType = elemType | string;
-export declare type functionsSettingsType = {
+export type elemType = HTMLElement | Element;
+export type getElementType = elemType | string;
+export type functionsSettingsType = {
     iconSize?: number | 48;
     popoutOptions?: popoutOptionsType;
     copyOptions?: copyOptionsType;
     notificationOptions?: notificationOptionsType;
 };
-export declare type popoutOptionsType = {
+export type popoutOptionsType = {
     title?: string;
     innerElems?: elemType | elemType[];
     parentElem?: HTMLElement;
@@ -37,14 +37,14 @@ export declare type popoutOptionsType = {
     onClosed?: Function;
     noAppendParentClass?: boolean;
 };
-export declare type copyOptionsType = {
+export type copyOptionsType = {
     withoutAnimation?: boolean;
     customDataAttributeKey?: string;
     animationParentsNum?: number;
     animationDuration?: number | typeof defaultCopyAnimationDuration;
 };
-export declare type jNotificationType = jPopoutType;
-export declare type notificationOptionsType = {
+export type jNotificationType = jPopoutType;
+export type notificationOptionsType = {
     exitIconURL?: string;
     isError?: boolean;
     parentElem?: elemType;
@@ -57,7 +57,7 @@ export declare type notificationOptionsType = {
     noRemoveContainerAfterClose?: boolean;
     elementOptions?: elementOptions;
 };
-export declare type tableOptionsType = {
+export type tableOptionsType = {
     names: string[];
     keys: string[];
     tableName?: string;
@@ -71,14 +71,14 @@ export declare type tableOptionsType = {
     nameClasses?: string[];
     search?: boolean;
 };
-export declare type sortTableOptionsType = {
+export type sortTableOptionsType = {
     table: HTMLTableElement;
     tdNum?: number;
     sortMode?: number | 1 | 2;
     reverseIfSame?: boolean;
     sortAttributeNames?: string;
 };
-export declare type timeUnitInputOptionsType = {
+export type timeUnitInputOptionsType = {
     value: number;
     changeCallback: Function;
     minValue?: number;

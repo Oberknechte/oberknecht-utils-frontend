@@ -1,6 +1,6 @@
 {
     "include": [
-        "./lib-ts/jchoose.ts",
+        "./lib-ts/jchoose.ts"
     ],
     "compilerOptions": {
         "downlevelIteration": true,
