@@ -10,33 +10,42 @@ import { isNullUndefined } from "oberknecht-utils/lib-js/utils/isNullUndefined.j
 import { functions, elements } from "../../defaults/lib-ts/defaults";
 let jChooseNum = 0;
 
+let selectContainers = {};
 export class jChoose {
-  readonly #sym = `jChoose-${jChooseNum++}`;
+  #sym = `jChoose-${jChooseNum++}`;
   get symbol() {
     return this.#sym;
   }
   #selectContainers: HTMLSelectElement[];
   #options: jChooseOptions;
-  #chooseOptions: jChooseOptionOptionArr[] = [];
+  #chooseOptions: Record<string, jChooseOptionOptionArr[]> = {};
+  get chooseOptions() {
+    if (!this.#chooseOptions[this.symbol])
+      this.#chooseOptions[this.symbol] = [];
+    return this.#chooseOptions[this.symbol] ?? [];
+  }
 
   constructor() {}
 
   choose = (options?: jChooseOptions) => {
+    this.#sym = `jChoose-${jChooseNum++}`;
     this.#options = options ?? {};
-    this.#selectContainers = [];
-    [
-      ...convertToArray(this.#options.appendSelectors, false),
-      ...defaultAppendClasses.map((a) => `.${a}`),
-    ].forEach((selector) => {
-      // @ts-ignore
-      this.#selectContainers.push(
-        ...(selector instanceof HTMLElement
-          ? [selector]
-          : document.querySelectorAll(selector))
-      );
-    });
+    selectContainers[this.symbol] = [];
+    (
+      convertToArray(this.#options.appendSelectors, true) ??
+      defaultAppendClasses.map((a) => `.${a}`)
+    )
+      .filter((a, i, arr) => !arr.slice(0, i).includes(a))
+      .forEach((selector) => {
+        // @ts-ignore
+        selectContainers[this.symbol].push(
+          ...(selector instanceof HTMLElement
+            ? [selector]
+            : document.querySelectorAll(selector))
+        );
+      });
 
-    this.#selectContainers.forEach((a) => this.createChoose(a));
+    selectContainers[this.symbol].forEach((a) => this.createChoose(a));
   };
 
   createChoose = (originalSelect: HTMLSelectElement) => {
@@ -44,7 +53,7 @@ export class jChoose {
     if (!(originalSelect instanceof HTMLSelectElement)) return;
     let chooseContainer = elements.createElement("div", {
       classes: ["jChoose-container"],
-      id: `jChoose-${originalSelect.id}`,
+      id: originalSelect.id ? `jChoose-${originalSelect.id}` : this.symbol,
     });
 
     let chooseSelected = elements.createElement("div", {
@@ -77,7 +86,7 @@ export class jChoose {
         (this_.#options.maxLength &&
           optionOptions.value.length > this_.#options.maxLength) ||
         (!this_.#options.allowDuplicates &&
-          this_.#chooseOptions.some(
+          this_.chooseOptions.some(
             (a: jChooseOptionOptionArr) => a.value === optionOptions.value
           ))
       )
@@ -120,10 +129,10 @@ export class jChoose {
         elem: chooseOptionContainer,
         optionElem: optionOptions.optionElem ?? chooseSelectOption,
       };
-      this_.#chooseOptions.push(d);
+      this_.#chooseOptions[this_.symbol].push(d);
 
       chooseOptionDelete.onclick = () => {
-        removeOption(this_.#chooseOptions.indexOf(d));
+        removeOption(this_.chooseOptions.indexOf(d));
       };
 
       functions.appendChildren(
@@ -142,12 +151,12 @@ export class jChoose {
     }
 
     function removeOption(index?: number) {
-      if (this_.#chooseOptions.length === 0) return;
-      index = !isNullUndefined(index) ? index : this_.#chooseOptions.length - 1;
-      let optionOptions = this_.#chooseOptions[index];
+      if (this_.chooseOptions.length === 0) return;
+      index = !isNullUndefined(index) ? index : this_.chooseOptions.length - 1;
+      let optionOptions = this_.chooseOptions[index];
 
-      this_.#chooseOptions = arrayModifiers.splice(
-        this_.#chooseOptions,
+      this_.#chooseOptions[this_.symbol] = arrayModifiers.splice(
+        this_.chooseOptions,
         index,
         1
       );
@@ -193,6 +202,6 @@ export class jChoose {
   };
 
   values = () => {
-    return this.#chooseOptions.map((a) => a.value);
+    return this.chooseOptions.map((a) => a.value);
   };
 }
