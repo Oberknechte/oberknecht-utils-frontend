@@ -1,0 +1,56 @@
+.jSwitchContainer {
+  width: 40px;
+  height: 22px;
+  cursor: pointer;
+  border: 1px solid;
+  padding: 3px;
+  border-radius: 10px;
+  position: relative;
+}
+
+.jSwitchContainer-enabled {
+  background-color: var(--color-green);
+}
+
+.jSwitchContainer-disabled {
+  background-color: var(--color-red);
+}
+
+.jSwitchInner {
+  width: 20px;
+  aspect-ratio: 1/1;
+  border: 1px solid;
+  border-radius: 100%;
+  position: absolute;
+  background-color: var(--color-background);
+}
+
+.jSwitchInner-enabled {
+  animation: jSwitchInner-enable 500ms;
+  animation-fill-mode: forwards;
+}
+
+.jSwitchInner-disabled {
+  animation: jSwitchInner-disable 500ms;
+  /* animation-fill-mode: forwards; */
+}
+
+@keyframes jSwitchInner-enable {
+  0% {
+    left: 3px;
+  }
+
+  100% {
+    left: 45%;
+  }
+}
+
+@keyframes jSwitchInner-disable {
+  0% {
+    left: 45%;
+  }
+
+  100% {
+    left: 3px;
+  }
+}

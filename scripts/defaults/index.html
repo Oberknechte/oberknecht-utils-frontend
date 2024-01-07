@@ -28,56 +28,8 @@
 <script>
   // elements.popout({ title: "test" });
   // elements.popout({ title: "test2" });
-  elements.createTable({
-    names: ["test", "test2"],
-    keys: [
-      elements.createElement("h", {
-        attributes: {
-          dest: "c",
-        },
-        innerText: "test1.1",
-      }),
-      elements.createElement("h", {
-        attributes: {
-          asd: "b",
-        },
-        innerText: "test1.3",
-      }),
-      "\n",
-      elements.createElement("h", {
-        attributes: {
-          dest: "a",
-        },
-        innerText: "test3",
-      }),
-      elements.createElement("h", {
-        attributes: {
-          asd: "a",
-        },
-        innerText: "test4",
-      }),
-      "\n",
-      elements.createElement("h", {
-        attributes: {
-          dest: "a",
-        },
-        innerText: "test2",
-      }),
-    ],
-    pe: "body",
-    sortOptions: {
-      sortAttributeNames: ["dest", "asd"],
-      tdNum: 0,
-      sortMode: 2,
-    },
-  });
 
-  elements.notification(Error("test"));
-  elements.notification(Error("test"));
-  setTimeout(() => {
-    elements.closeNotificationsAll();
-  }, 1000);
-
+  document.querySelector("body").appendChild(elements.createSwitch())
   // functions.copy('test')
 </script>
 

@@ -759,6 +759,36 @@ class elements {
         [timeUnitInputNumber, timeUnitInputUnitSelect].forEach((a) => timeUnitInputContainer.appendChild(a));
         return timeUnitInputContainer;
     };
+    static createSwitch = (enabled, changeCallback) => {
+        let switchState = enabled ?? false;
+        let switchContainer = elements.createElement("div", {
+            classes: ["jSwitchContainer"],
+        });
+        let switchInner = elements.createElement("div", {
+            classes: ["jSwitchInner"],
+            pe: switchContainer,
+        });
+        switchContainer.onclick = () => {
+            changeSwitch(!switchState);
+        };
+        function changeSwitch(changeState) {
+            switchState = changeState ?? !switchState;
+            if (switchState) {
+                switchContainer.classList.remove("jSwitchContainer-disabled");
+                switchInner.classList.remove("jSwitchInner-disabled");
+                switchContainer.classList.add("jSwitchContainer-enabled");
+                switchInner.classList.add("jSwitchInner-enabled");
+            }
+            else {
+                switchContainer.classList.remove("jSwitchContainer-enabled");
+                switchInner.classList.remove("jSwitchInner-enabled");
+                switchContainer.classList.add("jSwitchContainer-disabled");
+                switchInner.classList.add("jSwitchInner-disabled");
+            }
+        }
+        changeSwitch(switchState);
+        return switchContainer;
+    };
     static jChoose = jchoose_1.jChoose;
 }
 exports.elements = elements;
