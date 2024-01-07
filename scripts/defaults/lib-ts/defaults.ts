@@ -1071,7 +1071,7 @@ export class elements {
     };
 
     function changeSwitch(changeState?: boolean) {
-      if (switchState !== changeState) changeCallback?.(switchState);
+      let switchStateOld = switchState;
       switchState = changeState ?? !switchState;
 
       if (switchState) {
@@ -1085,6 +1085,8 @@ export class elements {
         switchContainer.classList.add("jSwitchContainer-disabled");
         switchInner.classList.add("jSwitchInner-disabled");
       }
+
+      if (switchStateOld !== switchState) changeCallback?.(switchState);
     }
 
     changeSwitch(switchState);
