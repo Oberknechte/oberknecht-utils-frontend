@@ -1072,6 +1072,7 @@ export class elements {
 
     function changeSwitch(changeState?: boolean) {
       switchState = changeState ?? !switchState;
+      changeCallback?.(switchState);
 
       if (switchState) {
         switchContainer.classList.remove("jSwitchContainer-disabled");
