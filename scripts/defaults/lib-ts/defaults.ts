@@ -595,6 +595,9 @@ export class elements {
       });
       let notificationCloseButton = elements.createElement("button", {
         classes: ["jnotification-button-close"],
+        onclick: () => {
+          notificationOptions.onclose?.(true);
+        },
       });
 
       [
@@ -616,7 +619,7 @@ export class elements {
         notificationCloseButton.appendChild(notificationCloseButtonImg);
 
         notificationCloseButton.onclick = () => {
-          closeNotification();
+          closeNotification(true);
         };
       })();
 
@@ -651,10 +654,10 @@ export class elements {
         animationDuration,
         true
       );
-      await closeNotification();
+      await closeNotification(false);
     })();
 
-    async function closeNotification() {
+    async function closeNotification(byUser) {
       notificationElem.classList.remove("jnotification");
       await elementModifiers.tempClass(
         notificationElem,
@@ -671,6 +674,8 @@ export class elements {
         notificationsContainerElem.remove();
         notificationsParentElem.classList.remove("jnotification-parent");
       }
+
+      notificationOptions.onclose?.(byUser);
     }
 
     [
@@ -683,7 +688,9 @@ export class elements {
       if (a.closeNotification) return;
       Object.defineProperty(a, "closeNotification", {
         get() {
-          return closeNotification;
+          return () => {
+            closeNotification(true);
+          };
         },
       });
     });

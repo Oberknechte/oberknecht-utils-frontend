@@ -56,6 +56,7 @@ export type notificationOptionsType = {
     noRemoveAfterClose?: boolean;
     noRemoveContainerAfterClose?: boolean;
     elementOptions?: elementOptions;
+    onclose?: (byUser?: boolean) => {};
 };
 export type tableOptionsType = {
     names: string[];

@@ -410,6 +410,9 @@ class elements {
             });
             let notificationCloseButton = elements.createElement("button", {
                 classes: ["jnotification-button-close"],
+                onclick: () => {
+                    notificationOptions.onclose?.(true);
+                },
             });
             [
                 notificationCloseButton,
@@ -427,7 +430,7 @@ class elements {
                 });
                 notificationCloseButton.appendChild(notificationCloseButtonImg);
                 notificationCloseButton.onclick = () => {
-                    closeNotification();
+                    closeNotification(true);
                 };
             })();
             [notificationTextElem, notificationButtonContainer].forEach((a) => notificationElem.appendChild(a));
@@ -443,9 +446,9 @@ class elements {
             // 1500
             500);
             await elementModifiers.tempClass(notificationElem, ["jnotification"], animationDuration, true);
-            await closeNotification();
+            await closeNotification(false);
         })();
-        async function closeNotification() {
+        async function closeNotification(byUser) {
             notificationElem.classList.remove("jnotification");
             await elementModifiers.tempClass(notificationElem, ["jnotification-disable"], 250);
             notificationElem.classList.add("dp-none");
@@ -457,6 +460,7 @@ class elements {
                 notificationsContainerElem.remove();
                 notificationsParentElem.classList.remove("jnotification-parent");
             }
+            notificationOptions.onclose?.(byUser);
         }
         [
             notificationElem,
@@ -469,7 +473,9 @@ class elements {
                 return;
             Object.defineProperty(a, "closeNotification", {
                 get() {
-                    return closeNotification;
+                    return () => {
+                        closeNotification(true);
+                    };
                 },
             });
         });
