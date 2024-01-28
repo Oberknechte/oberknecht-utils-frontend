@@ -879,17 +879,38 @@ export class elements {
         tableOptions.keys = [];
         let tableKeysOriginalLines = [[]];
         tableOptionsOriginal.keys.forEach((a) => {
-          if (a === "\n") tableKeysOriginalLines.push([]);
+          if (a === "\n") return tableKeysOriginalLines.push([]);
           tableKeysOriginalLines.at(-1).push(a);
         });
         tableKeysOriginalLines
-          .filter((a) =>
-            a.some(
-              (b) => typeof b === "string" && searchData.queryRegex.test(b)
-            )
-          )
+          .filter((a, i) => {
+            console.log(a);
+            return a.some((b, i2) => {
+              let tdNum = i2;
+
+              let tdAllowed =
+                !tableOptions.searchOptions.tdNums ||
+                convertToArray(tableOptions.searchOptions.tdNums).includes(
+                  tdNum
+                );
+
+              return (
+                tdAllowed &&
+                searchData.queryRegex.test(
+                  b instanceof HTMLElement
+                    ? tableOptions.searchOptions.tdAttributes?.[tdNum]
+                      ? b.getAttribute(
+                          tableOptions.searchOptions.tdAttributes?.[tdNum]
+                        )
+                      : // @ts-ignore
+                        b.value ?? b.innerText
+                    : b
+                )
+              );
+            });
+          })
           .forEach((a) => {
-            tableOptions.keys.push(...a);
+            tableOptions.keys.push(...a, "\n");
           });
 
         appendNoResults();
@@ -1129,7 +1150,7 @@ export class elements {
 
     actualCreateTable();
 
-    return tableElem;
+    return tableContainer;
   };
 
   static sortTable = (options: sortTableOptionsType) => {

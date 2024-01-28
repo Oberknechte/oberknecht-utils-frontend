@@ -38,7 +38,7 @@ export declare class elements {
     static closeNotification: (notificationContainerElem?: elemType) => Promise<void>;
     static closeNotificationsAll: () => void;
     static closeErrorNotification: () => void;
-    static createTable: (tableOptions: tableOptionsType) => HTMLTableElement;
+    static createTable: (tableOptions: tableOptionsType) => HTMLDivElement;
     static sortTable: (options: sortTableOptionsType) => void;
     static timeUnitInput: (options: timeUnitInputOptionsType) => HTMLDivElement;
     static createSwitch: (enabled?: boolean, changeCallback?: Function) => HTMLDivElement;

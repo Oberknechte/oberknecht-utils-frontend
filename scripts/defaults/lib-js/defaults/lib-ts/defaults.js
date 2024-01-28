@@ -628,13 +628,27 @@ class elements {
                 let tableKeysOriginalLines = [[]];
                 tableOptionsOriginal.keys.forEach((a) => {
                     if (a === "\n")
-                        tableKeysOriginalLines.push([]);
+                        return tableKeysOriginalLines.push([]);
                     tableKeysOriginalLines.at(-1).push(a);
                 });
                 tableKeysOriginalLines
-                    .filter((a) => a.some((b) => typeof b === "string" && searchData.queryRegex.test(b)))
+                    .filter((a, i) => {
+                    console.log(a);
+                    return a.some((b, i2) => {
+                        let tdNum = i2;
+                        let tdAllowed = !tableOptions.searchOptions.tdNums ||
+                            (0, utils_1.convertToArray)(tableOptions.searchOptions.tdNums).includes(tdNum);
+                        return (tdAllowed &&
+                            searchData.queryRegex.test(b instanceof HTMLElement
+                                ? tableOptions.searchOptions.tdAttributes?.[tdNum]
+                                    ? b.getAttribute(tableOptions.searchOptions.tdAttributes?.[tdNum])
+                                    : // @ts-ignore
+                                        b.value ?? b.innerText
+                                : b));
+                    });
+                })
                     .forEach((a) => {
-                    tableOptions.keys.push(...a);
+                    tableOptions.keys.push(...a, "\n");
                 });
                 appendNoResults();
                 actualCreateTable();
@@ -817,7 +831,7 @@ class elements {
             tableExists = true;
         }
         actualCreateTable();
-        return tableElem;
+        return tableContainer;
     };
     static sortTable = (options) => {
         if (!options?.table)

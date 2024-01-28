@@ -32,23 +32,23 @@
   // document.querySelector("body").appendChild(elements.createSwitch())
 
   let i = 0;
-  let tableOptions = {
-    // pe: "body",
+  elements.createTable({
+    pe: "body",
     names: ["a", "b"],
-    keys: ["a1", "b1", "\n", "a2", "b2", "\n", "\n"],
+    keys: ["a1", "b1", "\n", "a2", "b2", "\n", "x1", "y1", "\n"],
     search: true,
     searchOptions: {
-      callback: (query) => {
-        return new Promise(async(resolve, reject) => {
-          console.log("search callback", query)
-          setTimeout(() => {
-            resolve({keys: []})
-          }, 1500)
-        });
-      }
-    }
-  }
-  document.querySelector("body").appendChild(elements.createTable(tableOptions))
+      // callback: (query) => {
+      //   return new Promise(async(resolve, reject) => {
+      //     console.log("search callback", query)
+      //     setTimeout(() => {
+      //       resolve({keys: []})
+      //     }, 1500)
+      //   });
+      // }
+      tdNums: [1]
+    },
+  });
   // functions.copy('test')
 </script>
 

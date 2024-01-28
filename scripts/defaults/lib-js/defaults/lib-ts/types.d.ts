@@ -86,6 +86,8 @@ export type tableSearchOptionsType = {
     inputPlaceholder?: string;
     searchStopDelay?: number;
     searchAttributeNames?: string[][];
+    tdNums?: number | number[];
+    tdAttributes?: string[];
 };
 export type sortTableOptionsType = {
     table: HTMLTableElement;
