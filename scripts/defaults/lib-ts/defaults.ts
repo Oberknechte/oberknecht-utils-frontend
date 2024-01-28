@@ -884,7 +884,6 @@ export class elements {
         });
         tableKeysOriginalLines
           .filter((a, i) => {
-            console.log(a);
             return a.some((b, i2) => {
               let tdNum = i2;
 
