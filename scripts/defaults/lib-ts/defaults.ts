@@ -756,9 +756,13 @@ export class elements {
       tableOptions.searchOptions = {} as tableSearchOptionsType;
     if (!tableOptions.searchOptions.searchStopDelay)
       tableOptions.searchOptions.searchStopDelay = 1000;
-    tableOptions.keys = tableOptions.keys.filter(
-      (a, i, arr) => arr.at(-1) !== arr[i] || a !== "\n"
-    );
+    tableOptions.keys = tableOptions.keys
+      .filter(
+        (a, i, arr) =>
+          i === 0 || a !== "\n" || (a === "\n" && arr.at(i - 1) !== "\n")
+      )
+      .filter((a, i, arr) => i < arr.length - 1 || a !== "\n");
+
     let tableOptionsOriginal = recreate(tableOptions) as tableOptionsType;
 
     let tableID = tableOptions.tableName;
