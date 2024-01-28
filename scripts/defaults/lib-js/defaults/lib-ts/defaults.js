@@ -569,6 +569,7 @@ class elements {
             ? undefined
             : tableContainer.querySelector(`#${tableID}-search-input`) ??
                 elements.createElement("input", {
+                    id: `${tableID}-search-input`,
                     pe: tableSearchContainerElem,
                     placeholder: tableOptions.searchOptions?.inputPlaceholder ?? "Search Query",
                     classes: ["jTable-search-input", `${tableID}-search-input`],

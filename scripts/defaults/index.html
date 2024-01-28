@@ -32,7 +32,7 @@
   // document.querySelector("body").appendChild(elements.createSwitch())
 
   let i = 0;
-  elements.createTable({
+  let tableOptions = {
     pe: "body",
     names: ["a", "b"],
     keys: ["a1", "b1", "\n", "a2", "b2"],
@@ -47,7 +47,9 @@
         });
       }
     }
-  })
+  }
+  elements.createTable(tableOptions);
+  elements.createTable(tableOptions);
   // functions.copy('test')
 </script>
 

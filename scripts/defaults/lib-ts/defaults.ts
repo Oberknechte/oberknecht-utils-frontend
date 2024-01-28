@@ -814,6 +814,7 @@ export class elements {
           `#${tableID}-search-input`
         ) as HTMLInputElement) ??
         elements.createElement("input", {
+          id: `${tableID}-search-input`,
           pe: tableSearchContainerElem,
           placeholder:
             tableOptions.searchOptions?.inputPlaceholder ?? "Search Query",
