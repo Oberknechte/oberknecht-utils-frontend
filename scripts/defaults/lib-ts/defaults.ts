@@ -770,7 +770,7 @@ export class elements {
     let tableContainer: HTMLDivElement =
       (document.getElementById(`${tableID}-container`) as HTMLDivElement) ??
       elements.createElement("div", {
-        // ...(tableOptions.pe ? { pe: tableOptions.pe } : {}),
+        ...(tableOptions.pe ? { pe: tableOptions.pe } : {}),
         id: `${tableID}-container`,
         classes: ["jTable-container"],
       });

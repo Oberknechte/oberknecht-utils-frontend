@@ -535,7 +535,7 @@ class elements {
         let tableExists = (document.getElementById(tableID) ?? undefined) !== undefined;
         let tableContainer = document.getElementById(`${tableID}-container`) ??
             elements.createElement("div", {
-                // ...(tableOptions.pe ? { pe: tableOptions.pe } : {}),
+                ...(tableOptions.pe ? { pe: tableOptions.pe } : {}),
                 id: `${tableID}-container`,
                 classes: ["jTable-container"],
             });
