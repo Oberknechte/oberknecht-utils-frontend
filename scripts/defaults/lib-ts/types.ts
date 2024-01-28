@@ -76,7 +76,7 @@ export type notificationOptionsType = {
 
 export type tableOptionsType = {
   names: string[];
-  keys: string[];
+  keys: any[];
   tableName?: string;
   noClearTable?: boolean;
   parentElem?: getElementType;
@@ -87,6 +87,25 @@ export type tableOptionsType = {
   sortOptions?: sortTableOptionsType;
   nameClasses?: string[];
   search?: boolean;
+  searchOptions?: tableSearchOptionsType;
+};
+
+type tableSearchCallbackFunctionResolveType = {
+  keys: any[];
+};
+type tableSearchCallbackFunctionPromiseType = Promise<
+  tableSearchCallbackFunctionResolveType
+>;
+type tableSearchCallbackFunctionType = (callbackSearchData: {
+  query: string;
+  queryRegex: typeof RegExp;
+}) => tableSearchCallbackFunctionPromiseType;
+
+export type tableSearchOptionsType = {
+  callback?: tableSearchCallbackFunctionType;
+  inputPlaceholder?: string;
+  searchStopDelay?: number;
+  searchAttributeNames?: string[][];
 };
 
 export type sortTableOptionsType = {

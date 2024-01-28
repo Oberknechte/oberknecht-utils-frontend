@@ -24,12 +24,30 @@
     <!-- <button onclick="functions.copy('test')">copy</button> -->
   </body>
 </html>
-<script src="http://127.0.0.1:8081/mnt/dat/Programming/oberknecht-utils-frontend/scripts/defaults/lib-js/defaults/lib-ts/defaults.browser.js"></script>
+<script src="http://127.0.0.1:8081/mnt/dat/Programming/oberknecht-utils-frontend/scripts/defaults/lib-browser/defaults.browser.js"></script>
 <script>
   // elements.popout({ title: "test" });
   // elements.popout({ title: "test2" });
 
-  document.querySelector("body").appendChild(elements.createSwitch())
+  // document.querySelector("body").appendChild(elements.createSwitch())
+
+  let i = 0;
+  elements.createTable({
+    pe: "body",
+    names: ["a", "b"],
+    keys: ["a1", "b1", "\n", "a2", "b2"],
+    search: true,
+    searchOptions: {
+      callback: (query) => {
+        return new Promise(async(resolve, reject) => {
+          console.log("search callback", query)
+          setTimeout(() => {
+            resolve({keys: []})
+          }, 1500)
+        });
+      }
+    }
+  })
   // functions.copy('test')
 </script>
 

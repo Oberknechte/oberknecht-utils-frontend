@@ -4,13 +4,13 @@ const webpack = require("webpack");
 
 module.exports = {
   entry: {
-    js: {import: "./lib-ts/defaults.ts", filename: "./lib-js/[name].js"},
-    browser: {import: "./lib-ts/defaults.browser.ts", filename: "./lib-js/[name].js"},
+    js: {import: "./lib-ts/defaults.ts", filename: "./[name].js"},
+    browser: {import: "./lib-ts/defaults.browser.ts", filename: "./defaults.browser.js"},
   },
   // mode: "production",
   mode: "development",
   output: {
-    // path: path.resolve(__dirname, "./lib-js"),
+    path: path.resolve(__dirname, "./lib-browser"),
     // filename: "defaults.bundle.js",
   },
   plugins: [

@@ -515,49 +515,199 @@ class elements {
         this.closeNotification();
     };
     static createTable = (tableOptions) => {
-        let tableOptions_ = {
-            names: tableOptions.names ?? [],
-            keys: tableOptions.keys ?? [],
-            tableName: tableOptions.tableName ?? "jTable",
-            noClearTable: tableOptions.noClearTable ?? false,
-            pe: tableOptions.parentElem ?? tableOptions.pe ?? undefined,
-            noSort: tableOptions.noSort ?? false,
-            noSortAfter: tableOptions.noSortAfter ?? false,
-            noCopy: tableOptions.noCopy ?? false,
-            sortOptions: tableOptions.sortOptions,
-            nameClasses: tableOptions.nameClasses ?? [],
-            search: tableOptions.search ?? false,
-        };
-        let tableID = tableOptions_.tableName;
-        let nameClasses_ = [tableID, ...(0, utils_1.convertToArray)(tableOptions_.nameClasses)];
+        if (!tableOptions)
+            tableOptions = {};
+        tableOptions.names = tableOptions.names ?? [];
+        tableOptions.keys = tableOptions.keys ?? [];
+        tableOptions.tableName = tableOptions.tableName ?? "jTable";
+        tableOptions.pe = tableOptions.parentElem ?? tableOptions.pe ?? undefined;
+        tableOptions.nameClasses = tableOptions.nameClasses ?? [];
+        tableOptions.sortOptions =
+            tableOptions.sortOptions ?? {};
+        if (!tableOptions.searchOptions)
+            tableOptions.searchOptions = {};
+        if (!tableOptions.searchOptions.searchStopDelay)
+            tableOptions.searchOptions.searchStopDelay = 1000;
+        tableOptions.keys = tableOptions.keys.filter((a, i, arr) => arr.at(-1) !== arr[i] || a !== "\n");
+        let tableOptionsOriginal = (0, utils_1.recreate)(tableOptions);
+        let tableID = tableOptions.tableName;
+        let nameClasses_ = [tableID, ...(0, utils_1.convertToArray)(tableOptions.nameClasses)];
         let tableExists = (document.getElementById(tableID) ?? undefined) !== undefined;
-        let tableElem = document.getElementById(tableID) ??
-            elements.createElement("table");
-        tableElem.id = tableID;
+        let tableContainer = document.getElementById(`${tableID}-container`) ??
+            elements.createElement("div", {
+                pe: tableOptions.pe,
+                id: `${tableID}-container`,
+                classes: ["jTable-container"],
+            });
+        let tablezTopContainerElem = tableContainer.querySelector(`#${tableID}-ztop-container`) ??
+            elements.createElement("div", {
+                pe: tableContainer,
+                classes: [
+                    `jTable-ztop-container`,
+                    `${tableID}-ztop-container`,
+                    "jTable-ztop-container-hidden",
+                    `${tableID}-ztop-container-hidden`,
+                ],
+            });
+        let tableSearchContainerElem = !tableOptions.search
+            ? undefined
+            : tableContainer.querySelector(`#${tableID}-search`) ??
+                elements.createElement("div", {
+                    pe: tableContainer,
+                    classes: ["jTable-search-container", `${tableID}-search-container`],
+                });
+        let searchID = 0;
+        let searchData = {
+            query: "",
+            queryRegex: undefined,
+            lastInputTime: -1,
+            pendingSearchIDs: [],
+            searchTimeout: undefined,
+            currentSearchID: searchID,
+        };
+        let tableSearchInputElem = !tableOptions.search
+            ? undefined
+            : tableContainer.querySelector(`#${tableID}-search-input`) ??
+                elements.createElement("input", {
+                    pe: tableSearchContainerElem,
+                    placeholder: tableOptions.searchOptions?.inputPlaceholder ?? "Search Query",
+                    classes: ["jTable-search-input", `${tableID}-search-input`],
+                });
+        (() => {
+            // Search
+            if (!tableOptions.search)
+                return;
+            tableSearchInputElem.oninput = () => {
+                searchData.lastInputTime = Date.now();
+                searchData.query = tableSearchInputElem.value;
+                let queryRegex_ = searchData.query.replace(/^\/|\/$/g, "");
+                let isQueryRegex = (() => {
+                    return /^\/.+\/$/;
+                })().test(searchData.query);
+                searchData.queryRegex = isQueryRegex
+                    ? new RegExp(queryRegex_)
+                    : new RegExp((0, utils_1.regexEscape)(searchData.query));
+                clearSearchTimeout();
+                if (searchData.query.length === 0)
+                    return resetTable();
+                if (!tableOptions.searchOptions?.callback)
+                    return search();
+                searchData.searchTimeout = setTimeout(() => {
+                    search();
+                }, tableOptions.searchOptions.searchStopDelay);
+            };
+            tableSearchInputElem.onkeydown = (ev) => {
+                if (searchData.query.length === 0)
+                    return resetTable();
+                if (ev.keyCode === 13 || ev.key === "Enter") {
+                    clearSearchTimeout();
+                    search();
+                }
+            };
+            function clearSearchTimeout() {
+                if (searchData.searchTimeout)
+                    clearTimeout(searchData.searchTimeout);
+            }
+            function search() {
+                let currentSearchID = (searchData.currentSearchID = searchID++);
+                if (tableOptions.searchOptions.callback)
+                    searchCallback(currentSearchID);
+                else
+                    searchTable(currentSearchID);
+            }
+            function appendNoResults() {
+                if (tableOptions.keys.length > 0)
+                    return;
+                tableOptions.keys = [["@fw", "No Results found"]];
+            }
+            function searchTable(pendingSearchID) {
+                tableOptions.keys = [];
+                let tableKeysOriginalLines = [[]];
+                tableOptionsOriginal.keys.forEach((a) => {
+                    if (a === "\n")
+                        tableKeysOriginalLines.push([]);
+                    tableKeysOriginalLines.at(-1).push(a);
+                });
+                tableKeysOriginalLines
+                    .filter((a) => a.some((b) => typeof b === "string" && searchData.queryRegex.test(b)))
+                    .forEach((a) => {
+                    tableOptions.keys.push(...a);
+                });
+                appendNoResults();
+                actualCreateTable();
+            }
+            function searchCallback(pendingSearchID) {
+                if (tableOptions.searchOptions.callback) {
+                    tableOptions.keys = [];
+                    tablezTopContainerElem.innerHTML = "";
+                    tablezTopContainerElem.classList.remove("jTable-ztop-container-hidden", `${tableID}-ztop-container-hidden`);
+                    elements.createElement("h", {
+                        innerText: `Searching "${searchData.query}"`,
+                        classes: ["jTable-ztop-container-loading"],
+                        pe: tablezTopContainerElem,
+                    });
+                    actualCreateTable();
+                    tableOptions.searchOptions
+                        .callback?.({
+                        query: searchData.query,
+                        queryRegex: searchData.queryRegex,
+                    })
+                        .then((val) => {
+                        if (searchData.currentSearchID !== pendingSearchID)
+                            return;
+                        tableOptions.keys = val.keys;
+                        appendNoResults();
+                        actualCreateTable();
+                    })
+                        .finally(() => {
+                        utils_1.arrayModifiers.remove(searchData.pendingSearchIDs, pendingSearchID);
+                        if (searchData.currentSearchID !== pendingSearchID)
+                            return;
+                        tablezTopContainerElem.classList.add("jTable-ztop-container-hidden", `${tableID}-ztop-container-hidden`);
+                        tablezTopContainerElem
+                            .querySelector(".jTable-ztop-container-loading")
+                            ?.remove?.();
+                    });
+                }
+            }
+            function resetTable() {
+                tableOptions.keys = tableOptionsOriginal.keys;
+                actualCreateTable();
+            }
+        })();
+        let tableElem = tableContainer.querySelector(`#${tableID}`) ??
+            elements.createElement("table", {
+                id: tableID,
+                pe: tableContainer,
+                classes: ["jTable", tableID],
+            });
         if (!tableExists) {
-            tableElem.classList.add("jTable", tableID);
             let thtr = elements.createElement("tr");
-            tableOptions_.names.forEach((name, i) => {
+            let tableSortOptions = {
+                lastSortIndex: undefined,
+                sortMode: undefined,
+            };
+            tableOptions.names.forEach((name, i) => {
                 let th = elements.createElement("th");
                 th.classList.add("jTable-th", `${tableID}-th`, `${tableID}-th_${i}`);
                 th.innerText = name;
                 if (name.toString().length === 0)
                     th.classList.add("jTable-empty");
-                if (!tableOptions_.noSort || name.toString().length === 0) {
+                if (!tableOptions.noSort || name.toString().length === 0) {
                     th.classList.add("cursor-sort");
                     th.onclick = () => {
-                        let lastSortIndex = tableElem.getAttribute("sortThIndex");
-                        let lastSortMode = tableElem.getAttribute("sortMode");
-                        let lastSortMode_ = !lastSortIndex || lastSortIndex !== `${i}`
+                        let lastSortIndex = tableSortOptions.lastSortIndex;
+                        let lastSortMode = tableSortOptions.sortMode;
+                        let lastSortMode_ = (0, utils_1.isNullUndefined)(lastSortIndex) || lastSortIndex !== i
                             ? 0
-                            : parseInt(lastSortMode);
-                        let sortMode = [1, 2, 1].at(lastSortMode_);
+                            : lastSortMode;
+                        let sortMode = [2, 2, 1].at(lastSortMode_);
                         this.sortTable({
                             table: tableElem,
                             tdNum: i,
                             sortMode: sortMode,
                             reverseIfSame: true,
-                            ...getValuesFromObject(tableOptions_.sortOptions, [
+                            ...getValuesFromObject(tableOptions.sortOptions, [
                                 "sortAttributeNames",
                             ]),
                         });
@@ -566,85 +716,104 @@ class elements {
                             keys.forEach((a) => (r[a] = o[a]));
                             return r;
                         }
-                        tableElem.setAttribute("sortThIndex", i.toString());
-                        tableElem.setAttribute("sortMode", sortMode.toString());
+                        tableSortOptions.lastSortIndex = i;
+                        tableSortOptions.sortMode = sortMode;
                     };
                 }
                 thtr.appendChild(th);
             });
-            if (tableOptions_.names.length > 0)
+            if (tableOptions.names.length > 0)
                 tableElem.appendChild(thtr);
         }
-        if (tableExists && !tableOptions_.noClearTable)
-            [...tableElem.childNodes]
-                .filter(
-            // @ts-ignore
-            (a) => a.tagName == "TR" && [...a.childNodes][0].tagName == "TD")
-                .map((a) => a.remove());
-        let currentTR;
-        let currentTRNum = 0;
-        newTR();
-        function newTR() {
-            if (currentTR)
-                tableElem.appendChild(currentTR);
-            currentTR = elements.createElement("tr");
-            currentTR.classList.add("jTable-tr", `jTable-tr_${currentTRNum}`, ...nameClasses_.map((a) => `${a}-tr`), ...nameClasses_.map((a) => `${a}-tr_${currentTRNum}`));
-            currentTRNum++;
-        }
-        let tdBefore = [];
-        tableOptions_.keys.map((key, i) => {
-            tdBefore.push(i);
-            let tdNum = tdBefore.length - 1;
-            let key_ = functions.isHTMLElement(key) ? [key] : (0, utils_1.convertToArray)(key);
-            let skipKey = false;
-            let td = elements.createElement("td");
-            td.classList.add("jTable-td", `jTable-td_${tdNum}`, ...nameClasses_.map((a) => `${a}-td`), ...nameClasses_.map((a) => `${a}-td_${tdNum}`), `jTable-tr_${currentTRNum}`, `jTable-tr_${currentTRNum}-td_${tdNum}`, ...nameClasses_.map((a) => `${a}-tr_${currentTRNum}-td_${tdNum}`));
-            switch (key_[0]) {
-                case "@th": {
-                    td.classList.add("jTable-th", ...nameClasses_.map((a) => `${a}-th`));
-                    key_.splice(0, 1);
-                    td.innerText = key_?.join(" ");
-                    break;
-                }
-                case "\n": {
-                    newTR();
-                    skipKey = true;
-                    break;
-                }
-                default: {
-                    key_.forEach((a) => {
-                        if (functions.isHTMLElement(a)) {
-                            appendTD();
-                            return td.appendChild(a);
-                        }
+        function actualCreateTable() {
+            if (tableExists && !tableOptions.noClearTable)
+                [...tableElem.childNodes]
+                    ?.filter((a) => 
+                // @ts-ignore
+                a.tagName === "TR" &&
+                    (![...a.childNodes]?.[0] ||
+                        // @ts-ignore
+                        [...a.childNodes]?.[0]?.tagName !== "TH"))
+                    .map((a) => a.remove());
+            let currentTR;
+            let currentTRNum = 0;
+            newTR();
+            function newTR() {
+                if (currentTR)
+                    tableElem.appendChild(currentTR);
+                currentTR = elements.createElement("tr", {
+                    classes: [
+                        "jTable-tr",
+                        `jTable-tr_${currentTRNum}`,
+                        ...nameClasses_.map((a) => `${a}-tr`),
+                        ...nameClasses_.map((a) => `${a}-tr_${currentTRNum}`),
+                    ],
+                });
+                currentTRNum++;
+            }
+            let tdBefore = [];
+            tableOptions.keys.map((key, i) => {
+                tdBefore.push(i);
+                let tdNum = tdBefore.length - 1;
+                let key_ = functions.isHTMLElement(key) ? [key] : (0, utils_1.convertToArray)(key);
+                let skipKey = false;
+                let td = elements.createElement("td");
+                td.classList.add("jTable-td", `jTable-td_${tdNum}`, ...nameClasses_.map((a) => `${a}-td`), ...nameClasses_.map((a) => `${a}-td_${tdNum}`), `jTable-tr_${currentTRNum}`, `jTable-tr_${currentTRNum}-td_${tdNum}`, ...nameClasses_.map((a) => `${a}-tr_${currentTRNum}-td_${tdNum}`));
+                switch (key_[0]) {
+                    case "@th": {
+                        td.classList.add("jTable-th", ...nameClasses_.map((a) => `${a}-th`));
+                        key_.splice(0, 1);
                         td.innerText = key_?.join(" ");
-                        if (!tableOptions_.noCopy) {
-                            td.classList.add("jcopy");
-                            td.onclick = () => {
-                                functions.copy(td);
-                            };
-                        }
-                    });
-                    break;
+                        break;
+                    }
+                    case "@fw": {
+                        td.colSpan = tableOptions.names.length + 1;
+                        td.classList.add("jTable-td-search_notfound");
+                        key_.splice(0, 1);
+                        td.innerText = key_?.join(" ");
+                        break;
+                    }
+                    case "\n": {
+                        newTR();
+                        skipKey = true;
+                        break;
+                    }
+                    default: {
+                        key_.forEach((a) => {
+                            if (functions.isHTMLElement(a)) {
+                                appendTD();
+                                return td.appendChild(a);
+                            }
+                            td.innerText = key_?.join(" ");
+                            if (!tableOptions.noCopy) {
+                                td.classList.add("jcopy");
+                                td.onclick = () => {
+                                    functions.copy(td);
+                                };
+                            }
+                        });
+                        break;
+                    }
                 }
-            }
-            function appendTD() {
-                currentTR.appendChild(td);
-            }
-            if (key_.length === 0)
-                td.classList.add("jTable-empty", ...nameClasses_.map((a) => `${a}-empty`));
-            if (skipKey)
-                return (tdBefore = []);
-            appendTD();
-        });
-        tableElem.appendChild(currentTR);
-        if (tableOptions_.pe)
-            functions.getElement(tableOptions_.pe).appendChild(tableElem);
-        if (!tableOptions_.noSortAfter)
-            this.sortTable({
-                table: tableElem,
-                ...tableOptions_.sortOptions,
+                function appendTD() {
+                    currentTR.appendChild(td);
+                }
+                if (key_.length === 0)
+                    td.classList.add("jTable-empty", ...nameClasses_.map((a) => `${a}-empty`));
+                if (skipKey)
+                    return (tdBefore = []);
+                appendTD();
             });
+            if (tableOptions.keys[currentTRNum + 1] !== "\n")
+                tableElem.appendChild(currentTR);
+            if (!tableOptions.noSortAfter)
+                elements.sortTable({
+                    table: tableElem,
+                    ...tableOptions.sortOptions,
+                });
+            tableExists = true;
+        }
+        actualCreateTable();
         return tableElem;
     };
     static sortTable = (options) => {
