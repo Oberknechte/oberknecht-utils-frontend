@@ -30,6 +30,7 @@
   // elements.popout({ title: "test2" });
 
   document.querySelector("body").appendChild(elements.createSwitch({
+    enabled: true,
     changeCallback: (s) => {
       console.log("change" ,s);
       return new Promise((resolve, reject) => {

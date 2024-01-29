@@ -981,7 +981,9 @@ class elements {
             switchState = changeState ?? !switchState;
             if (switchStateOld !== switchState) {
                 (async () => {
-                    let changeCallbackReturn = switchOptions.changeCallback?.(switchState);
+                    let changeCallbackReturn = !skipChangeCallback
+                        ? switchOptions.changeCallback?.(switchState)
+                        : undefined;
                     switchContainer.classList.remove("jSwitchContainer-disabled", "jSwitchContainer-enabled");
                     switchInner.classList.remove("jSwitchInner-disabled", "jSwitchInner-enabled");
                     if (!skipChangeCallback)

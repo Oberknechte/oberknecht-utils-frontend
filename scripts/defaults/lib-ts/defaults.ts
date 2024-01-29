@@ -1328,7 +1328,7 @@ export class elements {
     });
 
     switchContainer.onclick = () => {
-      if(switchChanging) return;
+      if (switchChanging) return;
       changeSwitch(!switchState);
     };
 
@@ -1339,9 +1339,9 @@ export class elements {
 
       if (switchStateOld !== switchState) {
         (async () => {
-          let changeCallbackReturn = switchOptions.changeCallback?.(
-            switchState
-          );
+          let changeCallbackReturn = !skipChangeCallback
+            ? switchOptions.changeCallback?.(switchState)
+            : undefined;
 
           switchContainer.classList.remove(
             "jSwitchContainer-disabled",
@@ -1379,7 +1379,7 @@ export class elements {
             switchContainer.classList.add("jSwitchContainer-disabled"),
               switchInner.classList.add("jSwitchInner-disabled");
 
-              switchChanging = false;
+          switchChanging = false;
         })();
       }
     }

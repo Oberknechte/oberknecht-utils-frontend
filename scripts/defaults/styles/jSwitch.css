@@ -1,5 +1,5 @@
 .jSwitchContainer {
-  width: 60px;
+  width: 40px;
   height: 22px;
   cursor: pointer;
   border: 1px solid;
@@ -13,14 +13,20 @@
 
 .jSwitchContainer-enabled {
   background-color: var(--color-green);
+  justify-content: flex-end;
+  transition: all 500ms ease-in-out;
 }
 
 .jSwitchContainer-pending {
   background-color: var(--color-orange);
+  justify-content: center;
+  transition: all 500ms ease-in-out;
 }
 
 .jSwitchContainer-disabled {
   background-color: var(--color-red);
+  justify-content: flex-start;
+  transition: all 500ms ease-in-out;
 }
 
 .jSwitchInner {
@@ -35,15 +41,15 @@
 }
 
 .jSwitchInner-enabled {
-  left: 50%;
-  transform: translateX(calc(50% - 3px));
+  /* left: 50%;
+  transform: translateX(calc(50% - 3px)); */
   transition: all 500ms ease-in-out;
 }
 
 .jSwitchInner-pending {
   width: 14px;
-  left: 50%;
-  transform: translateX(-50%);
+  /* left: 50%;
+  transform: translateX(-50%); */
   
   border: 4px solid #3498db;
   border-top: 4px solid transparent;
@@ -53,16 +59,18 @@
 
 
 .jSwitchInner-disabled {
-  left: 3px;
-  transform: rotate(0deg);
+  /* left: 3px;
+  transform: rotate(0deg); */
   transition: all 500ms ease-in-out;
 }
 
 @keyframes jSwitchInner-pending {
   0% {
-    transform: translateX(-50%) rotate(0deg);
+    transform: rotate(0deg);
+    /* transform: translateX(-50%) rotate(0deg); */
   }
   100% {
-    transform: translateX(-50%) rotate(359deg);
+    /* transform: translateX(-50%) rotate(359deg); */
+    transform: rotate(359deg);
   }
 }
