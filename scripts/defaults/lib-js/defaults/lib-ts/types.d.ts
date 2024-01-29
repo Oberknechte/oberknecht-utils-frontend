@@ -101,4 +101,9 @@ export type timeUnitInputOptionsType = {
     changeCallback: Function;
     minValue?: number;
 };
+export type createSwitchOptions = {
+    enabled?: boolean;
+    changeCallback?: Function;
+    stateOnReject?: boolean;
+};
 export {};

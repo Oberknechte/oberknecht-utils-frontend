@@ -1,4 +1,4 @@
-import { copyOptionsType, elemType, elementOptions, functionsSettingsType, getElementType, jPopoutType, notificationOptionsType, popoutOptionsType, sortTableOptionsType, tableOptionsType, timeUnitInputOptionsType, version } from "./types";
+import { copyOptionsType, createSwitchOptions, elemType, elementOptions, functionsSettingsType, getElementType, jPopoutType, notificationOptionsType, popoutOptionsType, sortTableOptionsType, tableOptionsType, timeUnitInputOptionsType, version } from "./types";
 import { jChoose } from "../../jchoose/lib-ts/jchoose";
 export declare class functions {
     static url: URL;
@@ -41,7 +41,7 @@ export declare class elements {
     static createTable: (tableOptions: tableOptionsType) => HTMLDivElement;
     static sortTable: (options: sortTableOptionsType) => void;
     static timeUnitInput: (options: timeUnitInputOptionsType) => HTMLDivElement;
-    static createSwitch: (enabled?: boolean, changeCallback?: Function) => HTMLDivElement;
+    static createSwitch: (switchOptionsOrEnabled?: createSwitchOptions | boolean, changeCallback?: Function) => HTMLDivElement;
     static jChoose: typeof jChoose;
 }
 export declare class elementModifiers {

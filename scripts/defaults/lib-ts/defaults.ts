@@ -13,6 +13,7 @@ import {
 } from "oberknecht-utils/lib-js/utils";
 import {
   copyOptionsType,
+  createSwitchOptions,
   defaultCopyAnimationDuration,
   defaultExitIconURL,
   defaultNotificationAnimationDuration,
@@ -1296,8 +1297,27 @@ export class elements {
     return timeUnitInputContainer;
   };
 
-  static createSwitch = (enabled?: boolean, changeCallback?: Function) => {
-    let switchState = enabled ?? false;
+  static createSwitch = (
+    switchOptionsOrEnabled?: createSwitchOptions | boolean,
+    changeCallback?: Function
+  ) => {
+    let switchOptions: createSwitchOptions =
+      switchOptionsOrEnabled && typeof switchOptionsOrEnabled === "object"
+        ? switchOptionsOrEnabled
+        : {};
+
+    if (isNullUndefined(switchOptions.enabled))
+      switchOptions.enabled =
+        typeof switchOptionsOrEnabled === "boolean"
+          ? switchOptionsOrEnabled
+          : false;
+
+    if (isNullUndefined(switchOptions.changeCallback) && changeCallback)
+      switchOptions.changeCallback = changeCallback;
+
+    let switchChanging = false;
+
+    let switchState = undefined;
     let switchContainer = elements.createElement("div", {
       classes: ["jSwitchContainer"],
     });
@@ -1308,29 +1328,63 @@ export class elements {
     });
 
     switchContainer.onclick = () => {
+      if(switchChanging) return;
       changeSwitch(!switchState);
     };
 
-    function changeSwitch(changeState?: boolean) {
+    function changeSwitch(changeState?: boolean, skipChangeCallback?: boolean) {
+      switchChanging = true;
       let switchStateOld = switchState;
       switchState = changeState ?? !switchState;
 
-      if (switchState) {
-        switchContainer.classList.remove("jSwitchContainer-disabled");
-        switchInner.classList.remove("jSwitchInner-disabled");
-        switchContainer.classList.add("jSwitchContainer-enabled");
-        switchInner.classList.add("jSwitchInner-enabled");
-      } else {
-        switchContainer.classList.remove("jSwitchContainer-enabled");
-        switchInner.classList.remove("jSwitchInner-enabled");
-        switchContainer.classList.add("jSwitchContainer-disabled");
-        switchInner.classList.add("jSwitchInner-disabled");
-      }
+      if (switchStateOld !== switchState) {
+        (async () => {
+          let changeCallbackReturn = switchOptions.changeCallback?.(
+            switchState
+          );
 
-      if (switchStateOld !== switchState) changeCallback?.(switchState);
+          switchContainer.classList.remove(
+            "jSwitchContainer-disabled",
+            "jSwitchContainer-enabled"
+          );
+          switchInner.classList.remove(
+            "jSwitchInner-disabled",
+            "jSwitchInner-enabled"
+          );
+
+          if (!skipChangeCallback)
+            if (changeCallbackReturn instanceof Promise)
+              switchContainer.classList.add("jSwitchContainer-pending"),
+                switchInner.classList.add("jSwitchInner-pending"),
+                switchInner.classList.add("jSwitchInner-pending-animation"),
+                await changeCallbackReturn
+                  .then((r) => {
+                    switchState = r ?? true;
+                  })
+                  .catch(() => {
+                    switchState = switchOptions.stateOnReject ?? false;
+                  });
+            else switchState = changeCallbackReturn ?? switchState;
+
+          switchContainer.classList.remove("jSwitchContainer-pending");
+          switchInner.classList.remove(
+            "jSwitchInner-pending",
+            "jSwitchInner-pending-animation"
+          );
+
+          if (switchState)
+            switchContainer.classList.add("jSwitchContainer-enabled"),
+              switchInner.classList.add("jSwitchInner-enabled");
+          else
+            switchContainer.classList.add("jSwitchContainer-disabled"),
+              switchInner.classList.add("jSwitchInner-disabled");
+
+              switchChanging = false;
+        })();
+      }
     }
 
-    changeSwitch(switchState);
+    changeSwitch(switchOptions.enabled ?? false, true);
 
     return switchContainer;
   };

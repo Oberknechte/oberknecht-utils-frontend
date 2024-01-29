@@ -633,7 +633,6 @@ class elements {
                 });
                 tableKeysOriginalLines
                     .filter((a, i) => {
-                    console.log(a);
                     return a.some((b, i2) => {
                         let tdNum = i2;
                         let tdAllowed = !tableOptions.searchOptions.tdNums ||
@@ -951,8 +950,19 @@ class elements {
         [timeUnitInputNumber, timeUnitInputUnitSelect].forEach((a) => timeUnitInputContainer.appendChild(a));
         return timeUnitInputContainer;
     };
-    static createSwitch = (enabled, changeCallback) => {
-        let switchState = enabled ?? false;
+    static createSwitch = (switchOptionsOrEnabled, changeCallback) => {
+        let switchOptions = switchOptionsOrEnabled && typeof switchOptionsOrEnabled === "object"
+            ? switchOptionsOrEnabled
+            : {};
+        if ((0, utils_1.isNullUndefined)(switchOptions.enabled))
+            switchOptions.enabled =
+                typeof switchOptionsOrEnabled === "boolean"
+                    ? switchOptionsOrEnabled
+                    : false;
+        if ((0, utils_1.isNullUndefined)(switchOptions.changeCallback) && changeCallback)
+            switchOptions.changeCallback = changeCallback;
+        let switchChanging = false;
+        let switchState = undefined;
         let switchContainer = elements.createElement("div", {
             classes: ["jSwitchContainer"],
         });
@@ -961,27 +971,46 @@ class elements {
             pe: switchContainer,
         });
         switchContainer.onclick = () => {
+            if (switchChanging)
+                return;
             changeSwitch(!switchState);
         };
-        function changeSwitch(changeState) {
+        function changeSwitch(changeState, skipChangeCallback) {
+            switchChanging = true;
             let switchStateOld = switchState;
             switchState = changeState ?? !switchState;
-            if (switchState) {
-                switchContainer.classList.remove("jSwitchContainer-disabled");
-                switchInner.classList.remove("jSwitchInner-disabled");
-                switchContainer.classList.add("jSwitchContainer-enabled");
-                switchInner.classList.add("jSwitchInner-enabled");
+            if (switchStateOld !== switchState) {
+                (async () => {
+                    let changeCallbackReturn = switchOptions.changeCallback?.(switchState);
+                    switchContainer.classList.remove("jSwitchContainer-disabled", "jSwitchContainer-enabled");
+                    switchInner.classList.remove("jSwitchInner-disabled", "jSwitchInner-enabled");
+                    if (!skipChangeCallback)
+                        if (changeCallbackReturn instanceof Promise)
+                            switchContainer.classList.add("jSwitchContainer-pending"),
+                                switchInner.classList.add("jSwitchInner-pending"),
+                                switchInner.classList.add("jSwitchInner-pending-animation"),
+                                await changeCallbackReturn
+                                    .then((r) => {
+                                    switchState = r ?? true;
+                                })
+                                    .catch(() => {
+                                    switchState = switchOptions.stateOnReject ?? false;
+                                });
+                        else
+                            switchState = changeCallbackReturn ?? switchState;
+                    switchContainer.classList.remove("jSwitchContainer-pending");
+                    switchInner.classList.remove("jSwitchInner-pending", "jSwitchInner-pending-animation");
+                    if (switchState)
+                        switchContainer.classList.add("jSwitchContainer-enabled"),
+                            switchInner.classList.add("jSwitchInner-enabled");
+                    else
+                        switchContainer.classList.add("jSwitchContainer-disabled"),
+                            switchInner.classList.add("jSwitchInner-disabled");
+                    switchChanging = false;
+                })();
             }
-            else {
-                switchContainer.classList.remove("jSwitchContainer-enabled");
-                switchInner.classList.remove("jSwitchInner-enabled");
-                switchContainer.classList.add("jSwitchContainer-disabled");
-                switchInner.classList.add("jSwitchInner-disabled");
-            }
-            if (switchStateOld !== switchState)
-                changeCallback?.(switchState);
         }
-        changeSwitch(switchState);
+        changeSwitch(switchOptions.enabled ?? false, true);
         return switchContainer;
     };
     static jChoose = jchoose_1.jChoose;
