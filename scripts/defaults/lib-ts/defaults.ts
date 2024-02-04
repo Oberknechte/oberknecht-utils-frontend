@@ -1136,8 +1136,8 @@ export class elements {
         appendTD();
       });
 
-      if (tableOptions.keys[currentTRNum + 1] !== "\n")
-        tableElem.appendChild(currentTR);
+      // if (tableOptions.keys[currentTRNum + 1] !== "\n")
+      if (!currentTR.parentNode) tableElem.appendChild(currentTR);
 
       if (!tableOptions.noSortAfter)
         elements.sortTable({

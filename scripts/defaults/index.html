@@ -7,7 +7,7 @@
     <!-- <link href="http://127.0.0.1:5500/scripts/jchoose/browser/jchoose.css" rel="stylesheet"> -->
     <!-- <link href="http://127.0.0.1:8080/mnt/dat/Programming/oberknecht-utils-frontend/scripts/defaults/styles/jPopout.css" rel="stylesheet"/> -->
     <link
-      href="http://127.0.0.1:8081/mnt/dat/Programming/oberknecht-utils-frontend/scripts/defaults/styles/index.css"
+      href="http://127.0.0.1:8081/mnt/jdat/Programming/oberknecht-utils-frontend/scripts/defaults/styles/index.css"
       rel="stylesheet"
     />
   </head>
@@ -24,22 +24,16 @@
     <!-- <button onclick="functions.copy('test')">copy</button> -->
   </body>
 </html>
-<script src="http://127.0.0.1:8081/mnt/dat/Programming/oberknecht-utils-frontend/scripts/defaults/lib-browser/defaults.browser.js"></script>
+<script src="http://127.0.0.1:8081/mnt/jdat/Programming/oberknecht-utils-frontend/scripts/defaults/lib-browser/defaults.browser.js"></script>
 <script>
   // elements.popout({ title: "test" });
   // elements.popout({ title: "test2" });
 
-  document.querySelector("body").appendChild(elements.createSwitch({
-    enabled: true,
-    changeCallback: (s) => {
-      console.log("change" ,s);
-      return new Promise((resolve, reject) => {
-        setTimeout(() => {
-          resolve(s)
-        }, 3000)
-      });
-    }
-  }));
+  elements.createTable({
+    pe: "body",
+    names: ["a", "b"],
+    keys: ["a", "a2","a3", "\n", "b", "b2", "b3", "\n"]
+  })
 
 </script>
 
