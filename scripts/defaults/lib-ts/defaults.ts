@@ -1159,7 +1159,7 @@ export class elements {
     let sortMode = options.sortMode ?? 1;
     let sortAttributeNames = options.sortAttributeNames;
 
-    let trs = [...options.table.childNodes].slice(1);
+    let trs = [...options.table.querySelectorAll("tr")];
     const trs_ = [...trs];
     let trsLast = [];
 
