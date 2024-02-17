@@ -839,7 +839,7 @@ class elements {
         let tdNum = options.tdNum ?? 0;
         let sortMode = options.sortMode ?? 1;
         let sortAttributeNames = options.sortAttributeNames;
-        let trs = [...options.table.querySelectorAll("tr")];
+        let trs = [...options.table.querySelectorAll(".jTable-tr")];
         const trs_ = [...trs];
         let trsLast = [];
         trs.forEach((a) => a.remove());
