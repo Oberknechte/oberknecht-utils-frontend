@@ -1159,7 +1159,10 @@ export class elements {
     let sortMode = options.sortMode ?? 1;
     let sortAttributeNames = options.sortAttributeNames;
 
-    let trs = [...options.table.querySelectorAll(".jTable-tr")];
+    let trs = [...options.table.childNodes].filter((a) =>
+      // @ts-ignore
+      a.classList.contains(`${options.tableName}-tr`)
+    );
     const trs_ = [...trs];
     let trsLast = [];
 

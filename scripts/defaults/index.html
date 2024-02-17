@@ -30,16 +30,22 @@
   // elements.popout({ title: "test2" });
 
   elements.createTable({
+    tableName: "a",
     pe: "body",
     names: ["a", "b"],
-    keys: ["a", "a2","a3", "\n", "b", "b2", "b3", "\n"]
-  })
-
+    noSortAfter: true,
+    keys: [
+      "a",
+      elements.createTable({
+        tableName: "b",
+        keys: ["beh"],
+      }),
+    ],
+  });
 </script>
 
 <style>
   body {
     background-color: darkcyan;
   }
-
 </style>
