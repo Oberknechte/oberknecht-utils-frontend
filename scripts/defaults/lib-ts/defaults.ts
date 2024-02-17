@@ -1161,7 +1161,7 @@ export class elements {
 
     let trs = [...options.table.childNodes].filter((a) =>
       // @ts-ignore
-      a.classList.contains(`${options.tableName}-tr`)
+      a.classList.contains(`jTable-tr`)
     );
     const trs_ = [...trs];
     let trsLast = [];

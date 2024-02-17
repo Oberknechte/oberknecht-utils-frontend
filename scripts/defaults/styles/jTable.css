@@ -73,3 +73,7 @@
     text-align: center;
     background-color: #ff000090;
 }
+
+.jTable-tr:nth-child(2n + 1) > * {
+  background-color: var(--color-background-8);
+}

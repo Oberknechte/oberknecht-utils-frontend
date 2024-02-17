@@ -841,7 +841,7 @@ class elements {
         let sortAttributeNames = options.sortAttributeNames;
         let trs = [...options.table.childNodes].filter((a) => 
         // @ts-ignore
-        a.classList.contains(`${options.tableName}-tr`));
+        a.classList.contains(`jTable-tr`));
         const trs_ = [...trs];
         let trsLast = [];
         trs.forEach((a) => a.remove());
