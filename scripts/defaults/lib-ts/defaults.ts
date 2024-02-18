@@ -258,13 +258,14 @@ export class functions {
 export class elements {
   static createElement = <K extends keyof HTMLElementTagNameMap | string>(
     tagName: K | string,
-    options?: elementOptions
+    options?: elementOptions | elementOptions[]
   ): K extends keyof HTMLElementTagNameMap
     ? HTMLElementTagNameMap[K]
     : HTMLElement => {
     let r = document.createElement(tagName);
 
-    functions.appendElementOptions(r, options);
+    let options_ = concatJSON(convertToArray(options), true);
+    functions.appendElementOptions(r, options_);
 
     // @ts-ignore
     return r;

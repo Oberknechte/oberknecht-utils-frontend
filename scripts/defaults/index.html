@@ -29,19 +29,31 @@
   // elements.popout({ title: "test" });
   // elements.popout({ title: "test2" });
 
-  elements.createTable({
-    tableName: "a",
-    pe: "body",
-    names: ["a", "b"],
-    noSortAfter: true,
-    keys: [
-      "a",
-      elements.createTable({
-        tableName: "b",
-        keys: ["beh"],
-      }),
-    ],
-  });
+  // elements.createTable({
+  //   tableName: "a",
+  //   pe: "body",
+  //   names: ["a", "b"],
+  //   noSortAfter: true,
+  //   keys: [
+  //     "a",
+  //     elements.createTable({
+  //       tableName: "b",
+  //       keys: ["beh"],
+  //     }),
+  //   ],
+  // });
+
+  elements.createElement("h", [
+    {
+      innerText: "asd",
+      classes: ["a"],
+      pe: "body"
+    },
+    {
+      innerText: "a",
+      classes: ["b"]
+    }
+  ])
 </script>
 
 <style>
