@@ -10,6 +10,9 @@ import {
   recreate,
   regexEscape,
   arrayModifiers,
+  getKeyFromObject,
+  addKeysToObject,
+  deleteKeyFromObject,
 } from "oberknecht-utils/lib-js/utils";
 import {
   copyOptionsType,
@@ -252,6 +255,51 @@ export class functions {
   static undefinedOnEmptyString = (s: string) => {
     if (s.length === 0) return undefined;
     return s;
+  };
+
+  static localStorage = class {
+    static key = "j";
+
+    static init = () => {
+      let newStorage = { cache: {} };
+      this.setStorage(newStorage);
+    };
+
+    static initIfNonexistent = () => {
+      if (!(this.getStorage() ?? undefined)) this.init();
+    };
+
+    static getStorage = () => {
+      let item = localStorage.getItem(this.key);
+      if (!(item ?? undefined)) return null;
+      return JSON.parse(localStorage.getItem(this.key));
+    };
+
+    static setStorage = (newStorage) => {
+      localStorage.setItem(this.key, JSON.stringify(newStorage));
+    };
+
+    static getKey = (keypath) => {
+      let storage = this.getStorage();
+      return getKeyFromObject(storage, keypath);
+    };
+
+    static setKey = (keypath, value) => {
+      let storage = this.getStorage();
+      let newstorage = addKeysToObject(storage, keypath, value);
+      this.setStorage(newstorage);
+    };
+
+    static deleteKey = (keypath) => {
+      let storage = this.getStorage();
+      if (!this.getKey(keypath)) return;
+      let newstorage = deleteKeyFromObject(storage, keypath);
+      this.setStorage(newstorage);
+    };
+
+    static emptyCache = () => {
+      functions.localStorage.setKey("cache", {});
+    };
   };
 }
 

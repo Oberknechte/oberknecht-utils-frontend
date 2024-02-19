@@ -24,6 +24,18 @@ export declare class functions {
     static toNumber: (inp: string | number) => number;
     static convertUnitToTime: (unit_: string, value: string | number) => number;
     static undefinedOnEmptyString: (s: string) => string;
+    static localStorage: {
+        new (): {};
+        key: string;
+        init: () => void;
+        initIfNonexistent: () => void;
+        getStorage: () => any;
+        setStorage: (newStorage: any) => void;
+        getKey: (keypath: any) => any;
+        setKey: (keypath: any, value: any) => void;
+        deleteKey: (keypath: any) => void;
+        emptyCache: () => void;
+    };
 }
 export declare class elements {
     #private;

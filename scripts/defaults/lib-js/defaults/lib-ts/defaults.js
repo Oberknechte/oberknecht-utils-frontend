@@ -175,6 +175,45 @@ class functions {
             return undefined;
         return s;
     };
+    static localStorage = class {
+        static key = "j";
+        static init = () => {
+            let newStorage = { cache: {} };
+            this.setStorage(newStorage);
+        };
+        static initIfNonexistent = () => {
+            if (!(this.getStorage() ?? undefined))
+                this.init();
+        };
+        static getStorage = () => {
+            let item = localStorage.getItem(this.key);
+            if (!(item ?? undefined))
+                return null;
+            return JSON.parse(localStorage.getItem(this.key));
+        };
+        static setStorage = (newStorage) => {
+            localStorage.setItem(this.key, JSON.stringify(newStorage));
+        };
+        static getKey = (keypath) => {
+            let storage = this.getStorage();
+            return (0, utils_1.getKeyFromObject)(storage, keypath);
+        };
+        static setKey = (keypath, value) => {
+            let storage = this.getStorage();
+            let newstorage = (0, utils_1.addKeysToObject)(storage, keypath, value);
+            this.setStorage(newstorage);
+        };
+        static deleteKey = (keypath) => {
+            let storage = this.getStorage();
+            if (!this.getKey(keypath))
+                return;
+            let newstorage = (0, utils_1.deleteKeyFromObject)(storage, keypath);
+            this.setStorage(newstorage);
+        };
+        static emptyCache = () => {
+            functions.localStorage.setKey("cache", {});
+        };
+    };
 }
 exports.functions = functions;
 class elements {
