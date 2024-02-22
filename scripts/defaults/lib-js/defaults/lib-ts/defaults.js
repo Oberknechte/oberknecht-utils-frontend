@@ -579,7 +579,11 @@ class elements {
             elements.createElement("div", {
                 ...(tableOptions.pe ? { pe: tableOptions.pe } : {}),
                 id: `${tableID}-container`,
-                classes: ["jTable-container"],
+                classes: [
+                    "jTable-container",
+                    `${tableID}-container`,
+                    ...nameClasses_.map((a) => `${a}-container`),
+                ],
             });
         let tablezTopContainerElem = tableContainer.querySelector(`#${tableID}-ztop-container`) ??
             elements.createElement("div", {
@@ -596,7 +600,11 @@ class elements {
             : tableContainer.querySelector(`#${tableID}-search`) ??
                 elements.createElement("div", {
                     pe: tableContainer,
-                    classes: ["jTable-search-container", `${tableID}-search-container`],
+                    classes: [
+                        "jTable-search-container",
+                        `${tableID}-search-container`,
+                        ...nameClasses_.map((a) => `${a}-search-container`),
+                    ],
                 });
         let searchID = 0;
         let searchData = {
@@ -614,7 +622,11 @@ class elements {
                     id: `${tableID}-search-input`,
                     pe: tableSearchContainerElem,
                     placeholder: tableOptions.searchOptions?.inputPlaceholder ?? "Search Query",
-                    classes: ["jTable-search-input", `${tableID}-search-input`],
+                    classes: [
+                        "jTable-search-input",
+                        `${tableID}-search-input`,
+                        ...nameClasses_.map((a) => `${a}-search-input`),
+                    ],
                 });
         (() => {
             // Search
@@ -735,7 +747,7 @@ class elements {
             elements.createElement("table", {
                 id: tableID,
                 pe: tableContainer,
-                classes: ["jTable", tableID],
+                classes: ["jTable", tableID, ...nameClasses_],
             });
         if (!tableExists) {
             let thtr = elements.createElement("tr");

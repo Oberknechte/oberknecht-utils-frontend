@@ -829,7 +829,11 @@ export class elements {
       elements.createElement("div", {
         ...(tableOptions.pe ? { pe: tableOptions.pe } : {}),
         id: `${tableID}-container`,
-        classes: ["jTable-container"],
+        classes: [
+          "jTable-container",
+          `${tableID}-container`,
+          ...nameClasses_.map((a) => `${a}-container`),
+        ],
       });
 
     let tablezTopContainerElem: HTMLDivElement =
@@ -851,7 +855,11 @@ export class elements {
         ) as HTMLDivElement) ??
         elements.createElement("div", {
           pe: tableContainer,
-          classes: ["jTable-search-container", `${tableID}-search-container`],
+          classes: [
+            "jTable-search-container",
+            `${tableID}-search-container`,
+            ...nameClasses_.map((a) => `${a}-search-container`),
+          ],
         });
 
     let searchID = 0;
@@ -875,7 +883,11 @@ export class elements {
           pe: tableSearchContainerElem,
           placeholder:
             tableOptions.searchOptions?.inputPlaceholder ?? "Search Query",
-          classes: ["jTable-search-input", `${tableID}-search-input`],
+          classes: [
+            "jTable-search-input",
+            `${tableID}-search-input`,
+            ...nameClasses_.map((a) => `${a}-search-input`),
+          ],
         });
 
     (() => {
@@ -1026,7 +1038,7 @@ export class elements {
       elements.createElement("table", {
         id: tableID,
         pe: tableContainer,
-        classes: ["jTable", tableID],
+        classes: ["jTable", tableID, ...nameClasses_],
       });
 
     if (!tableExists) {
