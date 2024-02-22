@@ -7,7 +7,7 @@ export const defaultNotificationErrorAnimationDuration = -1 as const;
 
 export type elementOptionsExtra = {
   classes?: string | string[];
-  childNodes?: string | string[];
+  childNodes?: HTMLElement | HTMLElement[];
 };
 
 export type elementOptions = elementOptionsExtra & Record<string, any>;

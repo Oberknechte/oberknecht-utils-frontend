@@ -219,7 +219,7 @@ exports.functions = functions;
 class elements {
     static createElement = (tagName, options) => {
         let r = document.createElement(tagName);
-        let options_ = (0, utils_1.concatJSON)((0, utils_1.convertToArray)(options), true);
+        let options_ = (0, utils_1.concatJSON)((0, utils_1.convertToArray)(options).filter((a) => !!a), true);
         functions.appendElementOptions(r, options_);
         // @ts-ignore
         return r;

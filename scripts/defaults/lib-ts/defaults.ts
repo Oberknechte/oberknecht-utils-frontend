@@ -312,7 +312,10 @@ export class elements {
     : HTMLElement => {
     let r = document.createElement(tagName);
 
-    let options_ = concatJSON(convertToArray(options), true);
+    let options_ = concatJSON(
+      convertToArray(options).filter((a) => !!a),
+      true
+    );
     functions.appendElementOptions(r, options_);
 
     // @ts-ignore
