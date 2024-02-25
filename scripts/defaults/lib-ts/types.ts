@@ -88,6 +88,43 @@ export type tableOptionsType = {
   nameClasses?: string[];
   search?: boolean;
   searchOptions?: tableSearchOptionsType;
+  dropdownSort?: boolean;
+  dropdownSortOptions?: tableOptionsDropdownSortOptionEntry[];
+  filters?: boolean;
+  filtersOptions?: {
+    entries?: tableOptionsFiltersEntry[];
+    showDropdownByDefault?: boolean;
+    buttonOptions?: elementOptions;
+  };
+  noDisplayResults?: boolean;
+};
+
+export type tableOptionsDropdownSortOptionEntry = {
+  name: string;
+  tdNum: number;
+  sortMode: 1 | 2 | number;
+  attributeName?: string;
+  default?: boolean;
+};
+
+export type tableOptionsFiltersEntry = {
+  name: string;
+  attributeName: string;
+  value?: string;
+  enabledDefault?: boolean;
+  method?: "includes";
+  splitter?: string;
+  tdNums?: number | number[];
+  entryOptions?: elementOptions;
+};
+
+export type tableOptionsFilterEntryInternal = {
+  attributeName: string;
+  value?: string;
+  enabled?: boolean;
+  tdNums?: number | number[];
+  method?: "includes";
+  splitter?: string;
 };
 
 type tableSearchCallbackFunctionResolveType = {
@@ -108,14 +145,15 @@ export type tableSearchOptionsType = {
   searchAttributeNames?: string[][];
   tdNums?: number | number[];
   tdAttributes?: string[];
+  allowRegexQuery?: boolean;
 };
 
 export type sortTableOptionsType = {
-  table: HTMLTableElement;
+  table?: HTMLTableElement;
   tdNum?: number;
   sortMode?: number | 1 | 2;
   reverseIfSame?: boolean;
-  sortAttributeNames?: string;
+  sortAttributeNames?: string | string[];
 };
 
 export type timeUnitInputOptionsType = {

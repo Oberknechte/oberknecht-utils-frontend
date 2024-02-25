@@ -15,7 +15,8 @@
   --border-color-td: transparent;
 }
 
-.jTable {
+.jTable,
+.jTable-names {
   width: 99%;
   /* border: var(--border-width) solid var(--border-color); */
   /* background-color: var(--color-background-table); */
@@ -71,9 +72,33 @@
 
 .jTable-td-search_notfound {
     text-align: center;
-    background-color: #ff000090;
+    background-color: #ff000090 !important;
 }
 
 .jTable-tr:nth-child(2n + 1) > * {
   background-color: var(--color-background-8);
+}
+
+.jTable-sortDropdownContainer {
+	position: absolute;
+	right: 10px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 5px;
+}
+
+.jTable-sortDropdownButton {
+	outline: none;
+	border: none;
+	background-color: transparent;
+}
+
+.jTable-sortDropdownSelect {
+	border: none;
+}
+
+.jTable-filter-button {
+	border: none;
+	height: 100%;
 }

@@ -219,7 +219,7 @@ exports.functions = functions;
 class elements {
     static createElement = (tagName, options) => {
         let r = document.createElement(tagName);
-        let options_ = (0, utils_1.concatJSON)((0, utils_1.convertToArray)(options).filter((a) => !!a), true);
+        let options_ = (0, utils_1.concatJSON)((0, utils_1.convertToArray)(options).filter((a) => !!a), ["array", "json", "object"]);
         functions.appendElementOptions(r, options_);
         // @ts-ignore
         return r;
@@ -572,6 +572,7 @@ class elements {
             .filter((a, i, arr) => i === 0 || a !== "\n" || (a === "\n" && arr.at(i - 1) !== "\n"))
             .filter((a, i, arr) => i < arr.length - 1 || a !== "\n");
         let tableOptionsOriginal = (0, utils_1.recreate)(tableOptions);
+        let tableOptionsOriginal2 = (0, utils_1.recreate)(tableOptions);
         let tableID = tableOptions.tableName;
         let nameClasses_ = [tableID, ...(0, utils_1.convertToArray)(tableOptions.nameClasses)];
         let tableExists = (document.getElementById(tableID) ?? undefined) !== undefined;
@@ -595,17 +596,99 @@ class elements {
                     `${tableID}-ztop-container-hidden`,
                 ],
             });
+        let tableContainerTop = tableContainer.querySelector(`#${tableID}-container-top`) ??
+            elements.createElement("div", {
+                id: `${tableID}-container-top`,
+                pe: tableContainer,
+                classes: [
+                    "jTable-container-top",
+                    `${tableID}-container-top`,
+                    ...nameClasses_.map((a) => `${a}-container-top`),
+                ],
+            });
+        let tableContainerTop2 = tableContainerTop.querySelector(`#${tableID}-container-top2`) ??
+            elements.createElement("div", {
+                id: `${tableID}-container-top2`,
+                pe: tableContainerTop,
+                classes: [
+                    "jTable-container-top2",
+                    `${tableID}-container-top2`,
+                    ...nameClasses_.map((a) => `${a}-container-top2`),
+                    ...(!(tableOptions.search ||
+                        tableOptions.filtersOptions ||
+                        tableOptions.dropdownSort)
+                        ? ["dp-none"]
+                        : []),
+                ],
+            });
+        let tableContainerBottom = tableContainer.querySelector(`#${tableID}-container-bottom`) ??
+            elements.createElement("div", {
+                id: `${tableID}-container-bottom`,
+                pe: tableContainer,
+                classes: [
+                    "jTable-container-bottom",
+                    `${tableID}-container-bottom`,
+                    ...nameClasses_.map((a) => `${a}-container-bottom`),
+                ],
+            });
+        let tableContainerTop2Left = tableContainerTop2.querySelector(`#${tableID}-container-top2-left`) ??
+            elements.createElement("div", {
+                id: `${tableID}-container-top2-left`,
+                pe: tableContainerTop2,
+                classes: [
+                    "jTable-container-top2-left",
+                    `${tableID}-container-top2-left`,
+                    ...nameClasses_.map((a) => `${a}-container-top2-left`),
+                ],
+            });
+        let tableFilterContainerElem = !tableOptions.filters
+            ? undefined
+            : tableContainerTop2Left.querySelector(`#${tableID}-filters-container`) ??
+                elements.createElement("div", {
+                    id: `${tableID}-filters-container`,
+                    pe: tableContainerTop2Left,
+                    classes: [
+                        "jTable-filters-container",
+                        `${tableID}-filters-container`,
+                        ...nameClasses_.map((a) => `${a}-filters-container`),
+                    ],
+                });
         let tableSearchContainerElem = !tableOptions.search
             ? undefined
-            : tableContainer.querySelector(`#${tableID}-search`) ??
+            : tableContainerTop2Left.querySelector(`#${tableID}-search`) ??
                 elements.createElement("div", {
-                    pe: tableContainer,
+                    id: `${tableID}-search`,
+                    pe: tableContainerTop2Left,
                     classes: [
                         "jTable-search-container",
                         `${tableID}-search-container`,
                         ...nameClasses_.map((a) => `${a}-search-container`),
                     ],
                 });
+        let tableDropdownSortContainerElem = !tableOptions.dropdownSort
+            ? undefined
+            : tableContainerTop2.querySelector(`#${tableID}-sortDropdownContainer`) ??
+                elements.createElement("div", {
+                    id: `${tableID}-sortDropdownContainer`,
+                    classes: [
+                        "jTable-sortDropdownContainer",
+                        `${tableID}-sortDropdownContainer`,
+                        ...nameClasses_.map((a) => `${a}-sortDropdownContainer`),
+                    ],
+                    pe: tableContainerTop2,
+                });
+        let tableFiltersDropdownContainer = elements.createElement("div", {
+            pe: tableContainerTop,
+            classes: [
+                "jTable-filters-dropdownContainer",
+                `${tableID}-filters-dropdownContainer`,
+                ...nameClasses_.map((a) => `${a}-filters-dropdownContainer`),
+                ...(tableOptions.filtersOptions?.showDropdownByDefault
+                    ? []
+                    : ["dp-none"]),
+            ],
+        });
+        let defaultSortOption;
         let searchID = 0;
         let searchData = {
             query: "",
@@ -617,7 +700,7 @@ class elements {
         };
         let tableSearchInputElem = !tableOptions.search
             ? undefined
-            : tableContainer.querySelector(`#${tableID}-search-input`) ??
+            : tableSearchContainerElem.querySelector(`#${tableID}-search-input`) ??
                 elements.createElement("input", {
                     id: `${tableID}-search-input`,
                     pe: tableSearchContainerElem,
@@ -628,8 +711,8 @@ class elements {
                         ...nameClasses_.map((a) => `${a}-search-input`),
                     ],
                 });
+        // Search
         (() => {
-            // Search
             if (!tableOptions.search)
                 return;
             tableSearchInputElem.oninput = () => {
@@ -639,9 +722,10 @@ class elements {
                 let isQueryRegex = (() => {
                     return /^\/.+\/$/;
                 })().test(searchData.query);
-                searchData.queryRegex = isQueryRegex
-                    ? new RegExp(queryRegex_)
-                    : new RegExp((0, utils_1.regexEscape)(searchData.query));
+                searchData.queryRegex =
+                    isQueryRegex && tableOptions.searchOptions.allowRegexQuery
+                        ? new RegExp(queryRegex_)
+                        : new RegExp((0, utils_1.regexEscape)(searchData.query));
                 clearSearchTimeout();
                 if (searchData.query.length === 0)
                     return resetTable();
@@ -659,94 +743,115 @@ class elements {
                     search();
                 }
             };
-            function clearSearchTimeout() {
-                if (searchData.searchTimeout)
-                    clearTimeout(searchData.searchTimeout);
-            }
-            function search() {
-                let currentSearchID = (searchData.currentSearchID = searchID++);
-                if (tableOptions.searchOptions.callback)
-                    searchCallback(currentSearchID);
-                else
-                    searchTable(currentSearchID);
-            }
-            function appendNoResults() {
-                if (tableOptions.keys.length > 0)
-                    return;
-                tableOptions.keys = [["@fw", "No Results found"]];
-            }
-            function searchTable(pendingSearchID) {
-                tableOptions.keys = [];
-                let tableKeysOriginalLines = [[]];
-                tableOptionsOriginal.keys.forEach((a) => {
-                    if (a === "\n")
-                        return tableKeysOriginalLines.push([]);
-                    tableKeysOriginalLines.at(-1).push(a);
-                });
-                tableKeysOriginalLines
-                    .filter((a, i) => {
-                    return a.some((b, i2) => {
-                        let tdNum = i2;
-                        let tdAllowed = !tableOptions.searchOptions.tdNums ||
-                            (0, utils_1.convertToArray)(tableOptions.searchOptions.tdNums).includes(tdNum);
-                        return (tdAllowed &&
-                            searchData.queryRegex.test(b instanceof HTMLElement
-                                ? tableOptions.searchOptions.tdAttributes?.[tdNum]
-                                    ? b.getAttribute(tableOptions.searchOptions.tdAttributes?.[tdNum])
-                                    : // @ts-ignore
-                                        b.value ?? b.innerText
-                                : b));
-                    });
-                })
-                    .forEach((a) => {
-                    tableOptions.keys.push(...a, "\n");
-                });
-                appendNoResults();
-                actualCreateTable();
-            }
-            function searchCallback(pendingSearchID) {
-                if (tableOptions.searchOptions.callback) {
-                    tableOptions.keys = [];
-                    tablezTopContainerElem.innerHTML = "";
-                    tablezTopContainerElem.classList.remove("jTable-ztop-container-hidden", `${tableID}-ztop-container-hidden`);
-                    elements.createElement("h", {
-                        innerText: `Searching "${searchData.query}"`,
-                        classes: ["jTable-ztop-container-loading"],
-                        pe: tablezTopContainerElem,
-                    });
-                    actualCreateTable();
-                    tableOptions.searchOptions
-                        .callback?.({
-                        query: searchData.query,
-                        queryRegex: searchData.queryRegex,
-                    })
-                        .then((val) => {
-                        if (searchData.currentSearchID !== pendingSearchID)
-                            return;
-                        tableOptions.keys = val.keys;
-                        appendNoResults();
-                        actualCreateTable();
-                    })
-                        .finally(() => {
-                        utils_1.arrayModifiers.remove(searchData.pendingSearchIDs, pendingSearchID);
-                        if (searchData.currentSearchID !== pendingSearchID)
-                            return;
-                        tablezTopContainerElem.classList.add("jTable-ztop-container-hidden", `${tableID}-ztop-container-hidden`);
-                        tablezTopContainerElem
-                            .querySelector(".jTable-ztop-container-loading")
-                            ?.remove?.();
-                    });
-                }
-            }
-            function resetTable() {
-                tableOptions.keys = tableOptionsOriginal.keys;
-                actualCreateTable();
-            }
         })();
-        let tableElem = tableContainer.querySelector(`#${tableID}`) ??
+        function clearSearchTimeout() {
+            if (searchData.searchTimeout)
+                clearTimeout(searchData.searchTimeout);
+        }
+        function search() {
+            let currentSearchID = (searchData.currentSearchID = searchID++);
+            if (tableOptions.searchOptions.callback)
+                searchCallback(currentSearchID);
+            else
+                searchTable();
+        }
+        function appendNoResults() {
+            if (tableOptions.keys.length > 0)
+                return;
+            tableOptions.keys = [["@fw", "No Results found"]];
+        }
+        function searchTable() {
+            tableOptions.keys = [];
+            let tableKeysOriginalLines = [[]];
+            tableOptionsOriginal.keys.forEach((a) => {
+                if (a === "\n")
+                    return tableKeysOriginalLines.push([]);
+                tableKeysOriginalLines.at(-1).push(a);
+            });
+            tableKeysOriginalLines
+                .filter((a, i) => {
+                return a.some((b, i2) => {
+                    let tdNum = i2;
+                    if (!searchData.queryRegex)
+                        return true;
+                    let tdAllowed = !tableOptions.searchOptions.tdNums ||
+                        (0, utils_1.convertToArray)(tableOptions.searchOptions.tdNums).includes(tdNum);
+                    return (tdAllowed &&
+                        searchData.queryRegex.test(b instanceof HTMLElement
+                            ? tableOptions.searchOptions.tdAttributes?.[tdNum]
+                                ? b.getAttribute(tableOptions.searchOptions.tdAttributes?.[tdNum])
+                                : // @ts-ignore
+                                    b.value ?? b.innerText
+                            : b));
+                });
+            })
+                .forEach((a) => {
+                tableOptions.keys.push(...a, "\n");
+            });
+            appendFilters();
+        }
+        function searchCallback(pendingSearchID) {
+            if (tableOptions.searchOptions.callback) {
+                tableOptions.keys = [];
+                // tablezTopContainerElem.innerHTML = "";
+                // tablezTopContainerElem.classList.remove(
+                //   "jTable-ztop-container-hidden",
+                //   `${tableID}-ztop-container-hidden`
+                // );
+                // elements.createElement("h", {
+                //   innerText: `Searching "${searchData.query}"`,
+                //   classes: ["jTable-ztop-container-loading"],
+                //   pe: tablezTopContainerElem,
+                // });
+                tableOptions.keys = [["@fw", `Searching "${searchData.query}"`]];
+                actualCreateTable();
+                tableOptions.searchOptions
+                    .callback?.({
+                    query: searchData.query,
+                    queryRegex: searchData.queryRegex,
+                })
+                    .then((val) => {
+                    if (searchData.currentSearchID !== pendingSearchID)
+                        return;
+                    tableOptions.keys = val.keys;
+                    appendFilters();
+                })
+                    .catch((e) => {
+                    appendNoResults();
+                    actualCreateTable();
+                })
+                    .finally(() => {
+                    utils_1.arrayModifiers.remove(searchData.pendingSearchIDs, pendingSearchID);
+                    if (searchData.currentSearchID !== pendingSearchID)
+                        return;
+                    // tablezTopContainerElem.classList.add(
+                    //   "jTable-ztop-container-hidden",
+                    //   `${tableID}-ztop-container-hidden`
+                    // );
+                    // tablezTopContainerElem
+                    //   .querySelector(".jTable-ztop-container-loading")
+                    //   ?.remove?.();
+                });
+            }
+        }
+        function resetTable() {
+            tableOptions.keys = tableOptionsOriginal.keys;
+            appendFilters();
+        }
+        let tableNamesElem = tableContainerTop.querySelector(`#${tableID}-names`) ??
+            elements.createElement("table", {
+                id: `${tableID}-names`,
+                pe: tableContainerTop,
+                classes: [
+                    "jTable-names",
+                    `${tableID}-names`,
+                    ...nameClasses_.map((a) => `${a}-names`),
+                ],
+            });
+        let tableElem = tableContainerBottom.querySelector(`#${tableID}`) ??
             elements.createElement("table", {
                 id: tableID,
-                pe: tableContainer,
+                pe: tableContainerBottom,
                 classes: ["jTable", tableID, ...nameClasses_],
             });
         if (!tableExists) {
@@ -756,14 +861,24 @@ class elements {
                 sortMode: undefined,
             };
             tableOptions.names.forEach((name, i) => {
-                let th = elements.createElement("th");
-                th.classList.add("jTable-th", `${tableID}-th`, `${tableID}-th_${i}`);
-                th.innerText = name;
-                if (name.toString().length === 0)
-                    th.classList.add("jTable-empty");
-                if (!tableOptions.noSort || name.toString().length === 0) {
-                    th.classList.add("cursor-sort");
-                    th.onclick = () => {
+                let th = elements.createElement("th", {
+                    classes: [
+                        "jTable-th",
+                        `${tableID}-th`,
+                        `${tableID}-th_${i}`,
+                        ...(name.toString().length === 0 ? ["jTable-empty"] : []),
+                        ...(!tableOptions.noSort || name.toString().length === 0
+                            ? ["cursor-sort"]
+                            : []),
+                        "jTable-td",
+                        `jTable-td_${i}`,
+                        ...nameClasses_.map((a) => `${a}-td`),
+                        ...nameClasses_.map((a) => `${a}-td_${i}`),
+                    ],
+                    innerText: name,
+                    onclick: () => {
+                        if (tableOptions.noSort || name.toString().length === 0)
+                            return;
                         let lastSortIndex = tableSortOptions.lastSortIndex;
                         let lastSortMode = tableSortOptions.sortMode;
                         let lastSortMode_ = (0, utils_1.isNullUndefined)(lastSortIndex) || lastSortIndex !== i
@@ -786,12 +901,220 @@ class elements {
                         }
                         tableSortOptions.lastSortIndex = i;
                         tableSortOptions.sortMode = sortMode;
-                    };
-                }
+                    },
+                });
                 thtr.appendChild(th);
             });
             if (tableOptions.names.length > 0)
-                tableElem.appendChild(thtr);
+                tableNamesElem.appendChild(thtr);
+        }
+        if (tableOptions.dropdownSort) {
+            elements.createElement("h", {
+                innerText: "Sort by",
+                pe: tableDropdownSortContainerElem,
+            });
+            let currentSortOption;
+            let tableSortDropdownSelect = elements.createElement("select", {
+                pe: tableDropdownSortContainerElem,
+                classes: [
+                    "jTable-sortDropdownSelect",
+                    `${tableID}-sortDropdownSelect`,
+                    ...nameClasses_.map((a) => `${a}-sortDropdownSelect`),
+                ],
+                onchange: () => {
+                    currentSortOption =
+                        tableOptions.dropdownSortOptions[parseInt(tableSortDropdownSelect.value)];
+                    changeSort();
+                },
+            });
+            tableOptions.dropdownSortOptions?.forEach((option, i) => {
+                elements.createElement("option", {
+                    pe: tableSortDropdownSelect,
+                    innerText: option.name,
+                    value: i,
+                });
+                if (option.default) {
+                    currentSortOption = defaultSortOption = option;
+                    tableSortDropdownSelect.value = tableOptions.dropdownSortOptions
+                        .indexOf(option)
+                        .toString();
+                }
+            });
+            let sortModeOld = defaultSortOption?.sortMode ?? 1;
+            let tableSortDropdownModeButton = elements.createElement("button", {
+                classes: [
+                    "jTable-sortDropdownButton",
+                    `${tableID}-sortDropdownButton`,
+                    ...nameClasses_.map((a) => `${a}-sortDropdownButton`),
+                ],
+                innerText: "",
+                onclick: () => {
+                    changeSort();
+                },
+                pe: tableDropdownSortContainerElem,
+            });
+            function changeSort(sortMode) {
+                let option = currentSortOption ?? tableOptions.dropdownSortOptions[0];
+                sortMode = sortMode ?? [2, 1][[1, 2].indexOf(sortModeOld)];
+                sortModeOld = sortMode;
+                tableSortDropdownModeButton.innerText = ["⬇️", "⬆️"][sortMode - 1];
+                elements.sortTable({
+                    table: tableElem,
+                    sortMode: sortMode,
+                    tdNum: option.tdNum,
+                    sortAttributeNames: option.attributeName,
+                });
+            }
+            changeSort(sortModeOld);
+        }
+        let filters = [];
+        if (tableOptions.filters) {
+            let tableFiltersButton = tableFilterContainerElem.querySelector(`.${tableID}-filter-button`) ??
+                elements.createElement("button", [
+                    {
+                        pe: tableFilterContainerElem,
+                        id: `${tableID}-filter-button`,
+                        classes: [
+                            "jTable-filter-button",
+                            `${tableID}-filter-button`,
+                            ...nameClasses_.map((a) => `${a}-filter-button`),
+                        ],
+                        innerText: "Filters",
+                        onclick: () => {
+                            tableFiltersDropdownContainer.classList.toggle("dp-none");
+                        },
+                    },
+                    tableOptions.filtersOptions.buttonOptions,
+                ]);
+            let tableFiltersDropdownContainerTop = elements.createElement("div", {
+                pe: tableFiltersDropdownContainer,
+                classes: [
+                    "jTable-filter-dropdown-container-top",
+                    `${tableID}-filter-dropdown-container-top`,
+                    ...nameClasses_.map((a) => `${a}-dropdown-container-top`),
+                ],
+            });
+            let tableFiltersDropdownContainerBottom = elements.createElement("div", {
+                pe: tableFiltersDropdownContainer,
+                classes: [
+                    "jTable-filter-dropdown-container-bottom",
+                    `${tableID}-filter-dropdown-container-bottom`,
+                    ...nameClasses_.map((a) => `${a}-dropdown-container-bottom`),
+                ],
+            });
+            tableOptions.filtersOptions?.entries?.forEach((option) => {
+                let filterOption = {
+                    attributeName: option.attributeName,
+                    enabled: option.enabledDefault ?? false,
+                    tdNums: option.tdNums,
+                    method: option.method,
+                    splitter: option.splitter,
+                    value: option.value,
+                };
+                let tableFiltersDropdownContainerEntry = elements.createElement("div", [
+                    {
+                        classes: [
+                            "dp-fl_ce",
+                            "jTable-filter-dropdown-entry",
+                            `${tableID}-filter-dropdown-entry`,
+                            ...nameClasses_.map((a) => `${a}-dropdown-entry`),
+                        ],
+                        pe: tableFiltersDropdownContainerBottom,
+                        childNodes: [
+                            elements.createElement("input", {
+                                type: "checkbox",
+                                checked: option.enabledDefault,
+                                classes: [
+                                    "jTable-filter-dropdown-entry-checkbox",
+                                    `${tableID}-filter-dropdown-entry-checkbox`,
+                                    ...nameClasses_.map((a) => `${a}-dropdown-entry-checkbox`),
+                                ],
+                            }),
+                            elements.createElement("h", {
+                                innerText: option.name,
+                                classes: [
+                                    "jTable-filter-dropdown-entry-name",
+                                    `${tableID}-filter-dropdown-entry-name`,
+                                    ...nameClasses_.map((a) => `${a}-dropdown-entry-name`),
+                                ],
+                            }),
+                        ],
+                        onclick: (ev) => {
+                            filterOption.enabled = !filterOption.enabled;
+                            tableFiltersDropdownContainerEntry.querySelector(".jTable-filter-dropdown-entry-checkbox"
+                            // @ts-ignore
+                            ).checked = filterOption.enabled;
+                            searchTable();
+                        },
+                    },
+                    option.entryOptions,
+                ]);
+                filters.push(filterOption);
+            });
+            searchTable();
+        }
+        let tableEntriesDisplay = tableContainerTop2Left.querySelector(`#${tableID}-entries-display`) ??
+            elements.createElement("h", {
+                id: `${tableID}-entries-display`,
+                pe: tableContainerTop2Left,
+                classes: [
+                    "jTable-entries-display",
+                    `${tableID}-entries-display`,
+                    ...nameClasses_.map((a) => `${a}-entries-display`),
+                    ...(tableOptions.noDisplayResults ? ["dp-none"] : []),
+                ],
+                innerText: ``,
+            });
+        function updateEntriesDisplay() {
+            tableEntriesDisplay.innerText = `Found ${tableOptions.keys.filter((a) => a === "\n").length} results`;
+        }
+        function appendFilters() {
+            let usedKeys = tableOptions.keys;
+            tableOptions.keys = [];
+            let tableKeysOriginalLines = [[]];
+            usedKeys.forEach((a) => {
+                if (a === "\n")
+                    return tableKeysOriginalLines.push([]);
+                tableKeysOriginalLines.at(-1).push(a);
+            });
+            tableKeysOriginalLines
+                .filter((a, i) => {
+                return a.some((b, i2) => {
+                    let tdNum = i2;
+                    let filterValue = filters
+                        .filter((a) => a.enabled)
+                        .map((filter) => {
+                        let tdAllowed = !filter.tdNums ||
+                            (0, utils_1.convertToArray)(filter.tdNums).includes(tdNum);
+                        if (!tdAllowed ||
+                            !(b instanceof HTMLElement) ||
+                            !filter.attributeName)
+                            return false;
+                        let value = b.getAttribute(filter.attributeName);
+                        switch (filter.method) {
+                            case "includes": {
+                                return (value
+                                    ?.split(filter.splitter ?? ",")
+                                    ?.includes(filter.value) ?? false);
+                            }
+                            default: {
+                                if ((filter.value && filter.value === value) ||
+                                    (!filter.value && value))
+                                    return filter.value === value;
+                                return false;
+                            }
+                        }
+                    });
+                    return (filterValue.length === 0 ||
+                        filterValue.filter((a) => typeof a === "boolean").length === 0 ||
+                        filterValue.length === filterValue.filter((a) => !!a).length);
+                });
+            })
+                .forEach((a) => {
+                tableOptions.keys.push(...a, "\n");
+            });
+            appendNoResults();
+            actualCreateTable();
         }
         function actualCreateTable() {
             if (tableExists && !tableOptions.noClearTable)
@@ -873,7 +1196,7 @@ class elements {
                 appendTD();
             });
             // if (tableOptions.keys[currentTRNum + 1] !== "\n")
-            if (!currentTR.parentNode)
+            if (!currentTR.parentNode && currentTR.hasChildNodes())
                 tableElem.appendChild(currentTR);
             if (!tableOptions.noSortAfter)
                 elements.sortTable({
@@ -890,7 +1213,7 @@ class elements {
             return;
         let tdNum = options.tdNum ?? 0;
         let sortMode = options.sortMode ?? 1;
-        let sortAttributeNames = options.sortAttributeNames;
+        let sortAttributeNames = (0, utils_1.convertToArray)(options.sortAttributeNames);
         let trs = [...options.table.childNodes].filter((a) => 
         // @ts-ignore
         a.classList.contains(`jTable-tr`));
@@ -906,11 +1229,17 @@ class elements {
                 return;
             }
             let sortAttributeName = sortAttributeNames?.[tdNum];
-            let val = sortAttributeName
+            if (
+            // @ts-ignore
+            a.childNodes[tdNum].classList.contains("jTable-td-search_notfound")) {
+                trsLast.push([undefined, a]);
+                return;
+            }
+            let val = sortAttributeName && a.childNodes[tdNum].firstChild
                 ? // @ts-ignore
                     a.childNodes[tdNum].firstChild.getAttribute(sortAttributeName)
                 : // @ts-ignore
-                    a.childNodes[tdNum].innerText.replace(/\t|\s|\n/g, "");
+                    (a.childNodes[tdNum].innerText ?? "")?.replace(/\t|\s|\n/g, "");
             let isNum = regex_js_1.regex.numregex().test(val);
             if (!isNum)
                 allNumbers = false;
@@ -1069,6 +1398,18 @@ class elements {
         }
         changeSwitch(switchOptions.enabled ?? false, true);
         return switchContainer;
+    };
+    static hasParentAny = (elem, parentElem) => {
+        let r = false;
+        function checkParent(elem_) {
+            if ((0, utils_1.isNullUndefined)(elem_))
+                return;
+            if (elem_.parentNode === parentElem)
+                return (r = true);
+            return checkParent(elem_.parentNode);
+        }
+        checkParent(elem);
+        return r;
     };
     static jChoose = jchoose_1.jChoose;
 }

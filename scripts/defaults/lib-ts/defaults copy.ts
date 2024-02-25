@@ -316,7 +316,7 @@ export class elements {
 
     let options_ = concatJSON(
       convertToArray(options).filter((a) => !!a),
-      ["array", "json", "object"]
+      true
     );
     functions.appendElementOptions(r, options_);
 
@@ -876,13 +876,6 @@ export class elements {
           "jTable-container-top2",
           `${tableID}-container-top2`,
           ...nameClasses_.map((a) => `${a}-container-top2`),
-          ...(!(
-            tableOptions.search ||
-            tableOptions.filtersOptions ||
-            tableOptions.dropdownSort
-          )
-            ? ["dp-none"]
-            : []),
         ],
       });
 
@@ -900,26 +893,14 @@ export class elements {
         ],
       });
 
-    let tableContainerTop2Left =
-      tableContainerTop2.querySelector(`#${tableID}-container-top2-left`) ??
-      elements.createElement("div", {
-        id: `${tableID}-container-top2-left`,
-        pe: tableContainerTop2,
-        classes: [
-          "jTable-container-top2-left",
-          `${tableID}-container-top2-left`,
-          ...nameClasses_.map((a) => `${a}-container-top2-left`),
-        ],
-      });
-
     let tableFilterContainerElem: HTMLDivElement = !tableOptions.filters
       ? undefined
-      : (tableContainerTop2Left.querySelector(
+      : (tableContainerTop2.querySelector(
           `#${tableID}-filters-container`
         ) as HTMLDivElement) ??
         elements.createElement("div", {
           id: `${tableID}-filters-container`,
-          pe: tableContainerTop2Left,
+          pe: tableContainerTop2,
           classes: [
             "jTable-filters-container",
             `${tableID}-filters-container`,
@@ -929,12 +910,12 @@ export class elements {
 
     let tableSearchContainerElem: HTMLDivElement = !tableOptions.search
       ? undefined
-      : (tableContainerTop2Left.querySelector(
+      : (tableContainerTop2.querySelector(
           `#${tableID}-search`
         ) as HTMLDivElement) ??
         elements.createElement("div", {
           id: `${tableID}-search`,
-          pe: tableContainerTop2Left,
+          pe: tableContainerTop2,
           classes: [
             "jTable-search-container",
             `${tableID}-search-container`,
@@ -997,7 +978,7 @@ export class elements {
           ],
         });
 
-    // Search
+        // Search
     (() => {
       if (!tableOptions.search) return;
 
@@ -1010,10 +991,9 @@ export class elements {
           return /^\/.+\/$/;
         })().test(searchData.query);
 
-        searchData.queryRegex =
-          isQueryRegex && tableOptions.searchOptions.allowRegexQuery
-            ? new RegExp(queryRegex_)
-            : new RegExp(regexEscape(searchData.query));
+        searchData.queryRegex = isQueryRegex
+          ? new RegExp(queryRegex_)
+          : new RegExp(regexEscape(searchData.query));
 
         clearSearchTimeout();
         if (searchData.query.length === 0) return resetTable();
@@ -1030,115 +1010,116 @@ export class elements {
           search();
         }
       };
-    })();
 
-    function clearSearchTimeout() {
-      if (searchData.searchTimeout) clearTimeout(searchData.searchTimeout);
-    }
-
-    function search() {
-      let currentSearchID = (searchData.currentSearchID = searchID++);
-      if (tableOptions.searchOptions.callback) searchCallback(currentSearchID);
-      else searchTable();
-    }
-
-    function appendNoResults() {
-      if (tableOptions.keys.length > 0) return;
-      tableOptions.keys = [["@fw", "No Results found"]];
-    }
-
-    function searchTable() {
-      tableOptions.keys = [];
-      let tableKeysOriginalLines = [[]];
-      tableOptionsOriginal.keys.forEach((a) => {
-        if (a === "\n") return tableKeysOriginalLines.push([]);
-        tableKeysOriginalLines.at(-1).push(a);
-      });
-      tableKeysOriginalLines
-        .filter((a, i) => {
-          return a.some((b, i2) => {
-            let tdNum = i2;
-
-            if (!searchData.queryRegex) return true;
-
-            let tdAllowed =
-              !tableOptions.searchOptions.tdNums ||
-              convertToArray(tableOptions.searchOptions.tdNums).includes(tdNum);
-
-            return (
-              tdAllowed &&
-              searchData.queryRegex.test(
-                b instanceof HTMLElement
-                  ? tableOptions.searchOptions.tdAttributes?.[tdNum]
-                    ? b.getAttribute(
-                        tableOptions.searchOptions.tdAttributes?.[tdNum]
-                      )
-                    : // @ts-ignore
-                      b.value ?? b.innerText
-                  : b
-              )
-            );
-          });
-        })
-        .forEach((a) => {
-          tableOptions.keys.push(...a, "\n");
-        });
-
-      appendFilters();
-    }
-
-    function searchCallback(pendingSearchID) {
-      if (tableOptions.searchOptions.callback) {
-        tableOptions.keys = [];
-        // tablezTopContainerElem.innerHTML = "";
-        // tablezTopContainerElem.classList.remove(
-        //   "jTable-ztop-container-hidden",
-        //   `${tableID}-ztop-container-hidden`
-        // );
-
-        // elements.createElement("h", {
-        //   innerText: `Searching "${searchData.query}"`,
-        //   classes: ["jTable-ztop-container-loading"],
-        //   pe: tablezTopContainerElem,
-        // });
-
-        tableOptions.keys = [["@fw", `Searching "${searchData.query}"`]];
-        actualCreateTable();
-        tableOptions.searchOptions
-          .callback?.({
-            query: searchData.query,
-            queryRegex: searchData.queryRegex,
-          })
-          .then((val) => {
-            if (searchData.currentSearchID !== pendingSearchID) return;
-            tableOptions.keys = val.keys;
-            appendFilters();
-          })
-          .catch((e) => {
-            appendNoResults();
-            actualCreateTable();
-          })
-          .finally(() => {
-            arrayModifiers.remove(searchData.pendingSearchIDs, pendingSearchID);
-
-            if (searchData.currentSearchID !== pendingSearchID) return;
-
-            // tablezTopContainerElem.classList.add(
-            //   "jTable-ztop-container-hidden",
-            //   `${tableID}-ztop-container-hidden`
-            // );
-
-            // tablezTopContainerElem
-            //   .querySelector(".jTable-ztop-container-loading")
-            //   ?.remove?.();
-          });
+      function clearSearchTimeout() {
+        if (searchData.searchTimeout) clearTimeout(searchData.searchTimeout);
       }
-    }
 
-    function resetTable() {
-      tableOptions.keys = tableOptionsOriginal.keys;
-      appendFilters();
-    }
+      function search() {
+        let currentSearchID = (searchData.currentSearchID = searchID++);
+        if (tableOptions.searchOptions.callback)
+          searchCallback(currentSearchID);
+        else searchTable(currentSearchID);
+      }
+
+      function appendNoResults() {
+        if (tableOptions.keys.length > 0) return;
+        tableOptions.keys = [["@fw", "No Results found"]];
+      }
+
+      function searchTable(pendingSearchID) {
+        tableOptions.keys = [];
+        let tableKeysOriginalLines = [[]];
+        tableOptionsOriginal.keys.forEach((a) => {
+          if (a === "\n") return tableKeysOriginalLines.push([]);
+          tableKeysOriginalLines.at(-1).push(a);
+        });
+        tableKeysOriginalLines
+          .filter((a, i) => {
+            return a.some((b, i2) => {
+              let tdNum = i2;
+
+              let tdAllowed =
+                !tableOptions.searchOptions.tdNums ||
+                convertToArray(tableOptions.searchOptions.tdNums).includes(
+                  tdNum
+                );
+
+              return (
+                tdAllowed &&
+                searchData.queryRegex.test(
+                  b instanceof HTMLElement
+                    ? tableOptions.searchOptions.tdAttributes?.[tdNum]
+                      ? b.getAttribute(
+                          tableOptions.searchOptions.tdAttributes?.[tdNum]
+                        )
+                      : // @ts-ignore
+                        b.value ?? b.innerText
+                    : b
+                )
+              );
+            });
+          })
+          .forEach((a) => {
+            tableOptions.keys.push(...a, "\n");
+          });
+
+        appendNoResults();
+        appendFilters(true);
+        // actualCreateTable();
+      }
+
+      function searchCallback(pendingSearchID) {
+        if (tableOptions.searchOptions.callback) {
+          tableOptions.keys = [];
+          tablezTopContainerElem.innerHTML = "";
+          tablezTopContainerElem.classList.remove(
+            "jTable-ztop-container-hidden",
+            `${tableID}-ztop-container-hidden`
+          );
+
+          elements.createElement("h", {
+            innerText: `Searching "${searchData.query}"`,
+            classes: ["jTable-ztop-container-loading"],
+            pe: tablezTopContainerElem,
+          });
+          actualCreateTable();
+          tableOptions.searchOptions
+            .callback?.({
+              query: searchData.query,
+              queryRegex: searchData.queryRegex,
+            })
+            .then((val) => {
+              if (searchData.currentSearchID !== pendingSearchID) return;
+              tableOptions.keys = val.keys;
+              appendNoResults();
+              actualCreateTable();
+            })
+            .finally(() => {
+              arrayModifiers.remove(
+                searchData.pendingSearchIDs,
+                pendingSearchID
+              );
+
+              if (searchData.currentSearchID !== pendingSearchID) return;
+
+              tablezTopContainerElem.classList.add(
+                "jTable-ztop-container-hidden",
+                `${tableID}-ztop-container-hidden`
+              );
+
+              tablezTopContainerElem
+                .querySelector(".jTable-ztop-container-loading")
+                ?.remove?.();
+            });
+        }
+      }
+
+      function resetTable() {
+        tableOptions.keys = tableOptionsOriginal.keys;
+        actualCreateTable();
+      }
+    })();
 
     let tableNamesElem: HTMLTableElement =
       (tableContainerTop.querySelector(
@@ -1298,22 +1279,19 @@ export class elements {
     if (tableOptions.filters) {
       let tableFiltersButton =
         tableFilterContainerElem.querySelector(`.${tableID}-filter-button`) ??
-        elements.createElement("button", [
-          {
-            pe: tableFilterContainerElem,
-            id: `${tableID}-filter-button`,
-            classes: [
-              "jTable-filter-button",
-              `${tableID}-filter-button`,
-              ...nameClasses_.map((a) => `${a}-filter-button`),
-            ],
-            innerText: "Filters",
-            onclick: () => {
-              tableFiltersDropdownContainer.classList.toggle("dp-none");
-            },
+        elements.createElement("button", {
+          pe: tableFilterContainerElem,
+          id: `${tableID}-filter-button`,
+          classes: [
+            "jTable-filter-button",
+            `${tableID}-filter-button`,
+            ...nameClasses_.map((a) => `${a}-filter-button`),
+          ],
+          innerText: "Filters",
+          onclick: () => {
+            tableFiltersDropdownContainer.classList.toggle("dp-none");
           },
-          tableOptions.filtersOptions.buttonOptions,
-        ]);
+        });
 
       let tableFiltersDropdownContainerTop = elements.createElement("div", {
         pe: tableFiltersDropdownContainer,
@@ -1343,79 +1321,69 @@ export class elements {
           value: option.value,
         };
 
-        let tableFiltersDropdownContainerEntry = elements.createElement("div", [
-          {
-            classes: [
-              "dp-fl_ce",
-              "jTable-filter-dropdown-entry",
-              `${tableID}-filter-dropdown-entry`,
-              ...nameClasses_.map((a) => `${a}-dropdown-entry`),
-            ],
-            pe: tableFiltersDropdownContainerBottom,
-            childNodes: [
-              elements.createElement("input", {
-                type: "checkbox",
-                checked: option.enabledDefault,
-                classes: [
-                  "jTable-filter-dropdown-entry-checkbox",
-                  `${tableID}-filter-dropdown-entry-checkbox`,
-                  ...nameClasses_.map((a) => `${a}-dropdown-entry-checkbox`),
-                ],
-              }),
+        let tableFiltersDropdownContainerEntry = elements.createElement("div", {
+          classes: [
+            "dp-fl_ce",
+            "jTable-filter-dropdown-entry",
+            `${tableID}-filter-dropdown-entry`,
+            ...nameClasses_.map((a) => `${a}-dropdown-entry`),
+          ],
+          pe: tableFiltersDropdownContainerBottom,
+          childNodes: [
+            elements.createElement("input", {
+              type: "checkbox",
+              checked: option.enabledDefault,
+              classes: [
+                "jTable-filter-dropdown-entry-checkbox",
+                `${tableID}-filter-dropdown-entry-checkbox`,
+                ...nameClasses_.map((a) => `${a}-dropdown-entry-checkbox`),
+              ],
+            }),
 
-              elements.createElement("h", {
-                innerText: option.name,
-                classes: [
-                  "jTable-filter-dropdown-entry-name",
-                  `${tableID}-filter-dropdown-entry-name`,
-                  ...nameClasses_.map((a) => `${a}-dropdown-entry-name`),
-                ],
-              }),
-            ],
-            onclick: (ev) => {
-              filterOption.enabled = !filterOption.enabled;
-              tableFiltersDropdownContainerEntry.querySelector(
-                ".jTable-filter-dropdown-entry-checkbox"
-                // @ts-ignore
-              ).checked = filterOption.enabled;
+            elements.createElement("h", {
+              innerText: option.name,
+              classes: [
+                "jTable-filter-dropdown-entry-name",
+                `${tableID}-filter-dropdown-entry-name`,
+                ...nameClasses_.map((a) => `${a}-dropdown-entry-name`),
+              ],
+            }),
+          ],
+          onclick: (ev) => {
+            filterOption.enabled = !filterOption.enabled;
+            tableFiltersDropdownContainerEntry.querySelector(
+              ".jTable-filter-dropdown-entry-checkbox"
+              // @ts-ignore
+            ).checked = filterOption.enabled;
 
-              searchTable();
-            },
+            appendFilters();
           },
-          option.entryOptions,
-        ]);
+        });
 
         filters.push(filterOption);
       });
 
-      searchTable();
+      appendFilters();
     }
 
-    let tableEntriesDisplay: HTMLHeadElement =
-      tableContainerTop2Left.querySelector(`#${tableID}-entries-display`) ??
-      elements.createElement("h", {
-        id: `${tableID}-entries-display`,
-        pe: tableContainerTop2Left,
-        classes: [
-          "jTable-entries-display",
-          `${tableID}-entries-display`,
-          ...nameClasses_.map((a) => `${a}-entries-display`),
-          ...(tableOptions.noDisplayResults ? ["dp-none"] : []),
-        ],
-        innerText: ``,
-      });
+    let tableEntriesDisplay = tableContainerTop2.querySelector(`#${tableID}-entries-display`) ?? elements.createElement("h", {
+      id: `${tableID}-entries-display`,
+      pe: tableContainerTop2,
+      classes: [
+        "jTable-entries-display",
+        `${tableID}-entries-display`,
+        ...nameClasses_.map((a) => `${a}-entries-display`),
+        ...(tableOptions.noDisplayResults ? ["dp-none"] : [])
+      ],
+      innerText: ``
+    });
 
-    function updateEntriesDisplay() {
-      tableEntriesDisplay.innerText = `Found ${
-        tableOptions.keys.filter((a) => a === "\n").length
-      } results`;
-    }
+    function updateEntriesDisplay() {}
 
-    function appendFilters() {
-      let usedKeys = tableOptions.keys;
+    function appendFilters(useKeys?: boolean) {
       tableOptions.keys = [];
       let tableKeysOriginalLines = [[]];
-      usedKeys.forEach((a) => {
+      tableOptionsOriginal.keys.forEach((a) => {
         if (a === "\n") return tableKeysOriginalLines.push([]);
         tableKeysOriginalLines.at(-1).push(a);
       });
@@ -1431,6 +1399,8 @@ export class elements {
                   !filter.tdNums ||
                   convertToArray(filter.tdNums).includes(tdNum);
 
+                if (!filter.enabled) return undefined;
+
                 if (
                   !tdAllowed ||
                   !(b instanceof HTMLElement) ||
@@ -1441,11 +1411,9 @@ export class elements {
 
                 switch (filter.method) {
                   case "includes": {
-                    return (
-                      value
-                        ?.split(filter.splitter ?? ",")
-                        ?.includes(filter.value) ?? false
-                    );
+                    return value
+                      ?.split(filter.splitter ?? ",")
+                      ?.includes(filter.value);
                   }
 
                   default: {
@@ -1462,7 +1430,6 @@ export class elements {
 
             return (
               filterValue.length === 0 ||
-              filterValue.filter((a) => typeof a === "boolean").length === 0 ||
               filterValue.length === filterValue.filter((a) => !!a).length
             );
           });
@@ -1471,7 +1438,6 @@ export class elements {
           tableOptions.keys.push(...a, "\n");
         });
 
-      appendNoResults();
       actualCreateTable();
     }
 
@@ -1584,8 +1550,7 @@ export class elements {
       });
 
       // if (tableOptions.keys[currentTRNum + 1] !== "\n")
-      if (!currentTR.parentNode && currentTR.hasChildNodes())
-        tableElem.appendChild(currentTR);
+      if (!currentTR.parentNode) tableElem.appendChild(currentTR);
 
       if (!tableOptions.noSortAfter)
         elements.sortTable({

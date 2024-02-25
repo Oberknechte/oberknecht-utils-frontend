@@ -54,6 +54,7 @@ export declare class elements {
     static sortTable: (options: sortTableOptionsType) => void;
     static timeUnitInput: (options: timeUnitInputOptionsType) => HTMLDivElement;
     static createSwitch: (switchOptionsOrEnabled?: createSwitchOptions | boolean, changeCallback?: Function) => HTMLDivElement;
+    static hasParentAny: (elem: HTMLElement | EventTarget, parentElem: HTMLElement) => boolean;
     static jChoose: typeof jChoose;
 }
 export declare class elementModifiers {
