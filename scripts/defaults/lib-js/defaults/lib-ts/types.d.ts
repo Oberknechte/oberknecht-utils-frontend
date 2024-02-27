@@ -80,7 +80,7 @@ export declare type tableOptionsType = {
         showDropdownByDefault?: boolean;
         buttonOptions?: elementOptions;
     };
-    noDisplayResults?: boolean;
+    entriesDisplay?: boolean;
 };
 export declare type tableOptionsDropdownSortOptionEntry = {
     name: string;

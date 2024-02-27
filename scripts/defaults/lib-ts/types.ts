@@ -96,7 +96,7 @@ export type tableOptionsType = {
     showDropdownByDefault?: boolean;
     buttonOptions?: elementOptions;
   };
-  noDisplayResults?: boolean;
+  entriesDisplay?: boolean;
 };
 
 export type tableOptionsDropdownSortOptionEntry = {

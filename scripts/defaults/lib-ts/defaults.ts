@@ -997,6 +997,37 @@ export class elements {
           ],
         });
 
+    let tableEntriesDisplayContainer: HTMLHeadElement =
+      tableContainerTop2Left.querySelector(
+        `#${tableID}-entries-display-container`
+      ) ??
+      elements.createElement("div", {
+        id: `${tableID}-entries-display-container`,
+        pe: tableContainerTop2Left,
+        classes: [
+          "dp-fl_ce",
+          "jTable-entries-display-container",
+          `${tableID}-entries-display-container`,
+          ...nameClasses_.map((a) => `${a}-entries-display-container`),
+          ...(!tableOptions.entriesDisplay ? ["dp-none"] : []),
+        ],
+      });
+
+    let tableEntriesDisplay: HTMLHeadElement =
+      tableEntriesDisplayContainer.querySelector(
+        `#${tableID}-entries-display`
+      ) ??
+      elements.createElement("h", {
+        id: `${tableID}-entries-display`,
+        pe: tableEntriesDisplayContainer,
+        classes: [
+          "jTable-entries-display",
+          `${tableID}-entries-display`,
+          ...nameClasses_.map((a) => `${a}-entries-display`),
+        ],
+        innerText: `Loading`,
+      });
+
     // Search
     (() => {
       if (!tableOptions.search) return;
@@ -1391,20 +1422,6 @@ export class elements {
       searchTable();
     }
 
-    let tableEntriesDisplay: HTMLHeadElement =
-      tableContainerTop2Left.querySelector(`#${tableID}-entries-display`) ??
-      elements.createElement("h", {
-        id: `${tableID}-entries-display`,
-        pe: tableContainerTop2Left,
-        classes: [
-          "jTable-entries-display",
-          `${tableID}-entries-display`,
-          ...nameClasses_.map((a) => `${a}-entries-display`),
-          ...(tableOptions.noDisplayResults ? ["dp-none"] : []),
-        ],
-        innerText: ``,
-      });
-
     function updateEntriesDisplay() {
       tableEntriesDisplay.innerText = `Found ${
         tableOptions.keys.filter((a) => a === "\n").length
@@ -1473,6 +1490,7 @@ export class elements {
 
       appendNoResults();
       actualCreateTable();
+      updateEntriesDisplay();
     }
 
     function actualCreateTable() {
