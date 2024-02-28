@@ -15,7 +15,7 @@ export type elementOptionsExtra = {
   intervalTime?: number;
 };
 
-export type elementOptionIntervalType = (el?: HTMLElement) => void
+export type elementOptionIntervalType = (el?: HTMLElement) => void;
 
 export type elementOptions = elementOptionsExtra & Record<string, any>;
 
@@ -97,6 +97,7 @@ export type tableOptionsType = {
   searchOptions?: tableSearchOptionsType;
   dropdownSort?: boolean;
   dropdownSortOptions?: tableOptionsDropdownSortOptionEntry[];
+  dropdownButtonImgSrc?: string;
   filters?: boolean;
   filtersOptions?: {
     entries?: tableOptionsFiltersEntry[];

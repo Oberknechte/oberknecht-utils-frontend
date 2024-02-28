@@ -80,6 +80,7 @@ export declare type tableOptionsType = {
     searchOptions?: tableSearchOptionsType;
     dropdownSort?: boolean;
     dropdownSortOptions?: tableOptionsDropdownSortOptionEntry[];
+    dropdownButtonImgSrc?: string;
     filters?: boolean;
     filtersOptions?: {
         entries?: tableOptionsFiltersEntry[];

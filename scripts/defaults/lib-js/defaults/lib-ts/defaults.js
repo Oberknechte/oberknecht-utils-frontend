@@ -983,11 +983,18 @@ class elements {
             let sortModeOld = defaultSortOption?.sortMode ?? 1;
             let tableSortDropdownModeButton = elements.createElement("button", {
                 classes: [
+                    "dp-fl_ce",
                     "jTable-sortDropdownButton",
                     `${tableID}-sortDropdownButton`,
                     ...nameClasses_.map((a) => `${a}-sortDropdownButton`),
                 ],
-                innerText: "",
+                childNodes: [
+                    elements.createElement("img", {
+                        classes: ["tableSortDropdownModeButtonImg"],
+                        src: tableOptions.dropdownButtonImgSrc ??
+                            "https://cdn-0.emojis.wiki/emoji-pics/icons8/down-arrow-icons8.png",
+                    }),
+                ],
                 onclick: () => {
                     changeSort();
                 },
@@ -997,7 +1004,8 @@ class elements {
                 let option = currentSortOption ?? tableOptions.dropdownSortOptions[0];
                 sortMode = sortMode ?? [2, 1][[1, 2].indexOf(sortModeOld)];
                 sortModeOld = sortMode;
-                tableSortDropdownModeButton.innerText = ["⬇️", "⬆️"][sortMode - 1];
+                // tableSortDropdownModeButton.innerText = ["⬇️", "⬆️"][sortMode - 1];
+                tableSortDropdownModeButton.classList[sortMode === 2 ? "add" : "remove"]("tableSortDropdownModeButton-rotated", "jTable-sortDropdownButton-rotated", `${tableID}-sortDropdownButton.rotated`, ...(0, utils_1.convertToArray)(tableOptions.nameClasses).map((a) => `${a}-sortDropdownButton-rotated`));
                 elements.sortTable({
                     table: tableElem,
                     sortMode: sortMode,
