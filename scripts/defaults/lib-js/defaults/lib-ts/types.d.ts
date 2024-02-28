@@ -5,13 +5,19 @@ export declare const defaultNotificationErrorAnimationDuration: -1;
 export declare type elementOptionsExtra = {
     classes?: string | string[];
     childNodes?: HTMLElement | HTMLElement[];
+    pe?: getElementType;
+    parentElem?: getElementType;
+    attributes?: Record<string, string>;
+    interval?: elementOptionIntervalType;
+    intervalTime?: number;
 };
+export declare type elementOptionIntervalType = (el?: HTMLElement) => void;
 export declare type elementOptions = elementOptionsExtra & Record<string, any>;
 export declare type version = {
     npm: string;
 };
 export declare type jPopoutType = HTMLElement & {
-    closePopout: () => {};
+    closePopout: () => void;
 };
 export declare type elemType = HTMLElement | Element;
 export declare type getElementType = elemType | string;
@@ -56,7 +62,7 @@ export declare type notificationOptionsType = {
     noRemoveAfterClose?: boolean;
     noRemoveContainerAfterClose?: boolean;
     elementOptions?: elementOptions;
-    onclose?: (byUser?: boolean) => {};
+    onclose?: (byUser?: boolean) => void;
 };
 export declare type tableOptionsType = {
     names: string[];
@@ -80,7 +86,7 @@ export declare type tableOptionsType = {
         showDropdownByDefault?: boolean;
         buttonOptions?: elementOptions;
     };
-    entriesDisplay?: boolean;
+    entriesDisplay?: boolean | "filterOnly";
 };
 export declare type tableOptionsDropdownSortOptionEntry = {
     name: string;

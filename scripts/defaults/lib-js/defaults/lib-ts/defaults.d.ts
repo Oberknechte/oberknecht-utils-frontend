@@ -10,6 +10,7 @@ export declare class functions {
     static getParent: (elem: HTMLElement, number?: number) => any;
     static getElement: (elemOrQuery: elemType | string) => HTMLElement;
     static getElements: (elemsOrQuerys: (elemType | string) | (elemType | string)[]) => HTMLElement[];
+    static getParentWithClass: (elem: getElementType, searchClass: string, includeElem?: boolean, maxParentNodes?: number) => any;
     static parseIconURL: (u: string, size?: string) => string;
     static copy: (elemOrData: any, copyOptions_?: copyOptionsType) => Promise<void>;
     static isHTMLElement: (elem: any) => boolean;

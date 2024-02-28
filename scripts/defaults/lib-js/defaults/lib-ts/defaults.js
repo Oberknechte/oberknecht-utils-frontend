@@ -48,6 +48,12 @@ class functions {
                     });
                     break;
                 }
+                case "interval": {
+                    setInterval(() => {
+                        options.interval(element);
+                    }, options.intervalTime ?? 10000);
+                    break;
+                }
                 default: {
                     // @ts-ignore
                     if (options[optionName])
@@ -78,6 +84,19 @@ class functions {
         if (!this.checkBrowser())
             throw Error("Not in browser");
         return (0, utils_1.convertToArray)(elemsOrQuerys, false, true).map((a) => this.getElement(a));
+    };
+    static getParentWithClass = (elem, searchClass, includeElem, maxParentNodes) => {
+        let elem_ = functions.getElement(elem);
+        let n = 0;
+        function actualGetParentWithClass(elem2) {
+            n++;
+            if ((0, utils_1.isNullUndefined)(elem2) || (maxParentNodes && n >= maxParentNodes))
+                return undefined;
+            if (elem2.classList.contains(searchClass))
+                return elem2;
+            return actualGetParentWithClass(elem2?.parentElement);
+        }
+        return actualGetParentWithClass(includeElem ? elem_ : elem_?.parentElement);
     };
     static parseIconURL = (u, size) => {
         let u_ = new URL(u.startsWith("/") ? this.url.origin + u : u);
@@ -572,7 +591,6 @@ class elements {
             .filter((a, i, arr) => i === 0 || a !== "\n" || (a === "\n" && arr.at(i - 1) !== "\n"))
             .filter((a, i, arr) => i < arr.length - 1 || a !== "\n");
         let tableOptionsOriginal = (0, utils_1.recreate)(tableOptions);
-        let tableOptionsOriginal2 = (0, utils_1.recreate)(tableOptions);
         let tableID = tableOptions.tableName;
         let nameClasses_ = [tableID, ...(0, utils_1.convertToArray)(tableOptions.nameClasses)];
         let tableExists = (document.getElementById(tableID) ?? undefined) !== undefined;
@@ -641,18 +659,17 @@ class elements {
                     ...nameClasses_.map((a) => `${a}-container-top2-left`),
                 ],
             });
-        let tableFilterContainerElem = !tableOptions.filters
-            ? undefined
-            : tableContainerTop2Left.querySelector(`#${tableID}-filters-container`) ??
-                elements.createElement("div", {
-                    id: `${tableID}-filters-container`,
-                    pe: tableContainerTop2Left,
-                    classes: [
-                        "jTable-filters-container",
-                        `${tableID}-filters-container`,
-                        ...nameClasses_.map((a) => `${a}-filters-container`),
-                    ],
-                });
+        let tableFilterContainerElem = tableContainerTop2Left.querySelector(`#${tableID}-filters-container`) ??
+            elements.createElement("div", {
+                id: `${tableID}-filters-container`,
+                pe: tableContainerTop2Left,
+                classes: [
+                    "jTable-filters-container",
+                    `${tableID}-filters-container`,
+                    ...nameClasses_.map((a) => `${a}-filters-container`),
+                    ...(!tableOptions.filters ? ["dp-none"] : []),
+                ],
+            });
         let tableSearchContainerElem = !tableOptions.search
             ? undefined
             : tableContainerTop2Left.querySelector(`#${tableID}-search`) ??
@@ -990,41 +1007,44 @@ class elements {
             }
             changeSort(sortModeOld);
         }
+        let tableFiltersButton = tableFilterContainerElem.querySelector(`.${tableID}-filter-button`) ??
+            elements.createElement("button", [
+                {
+                    pe: tableFilterContainerElem,
+                    id: `${tableID}-filter-button`,
+                    classes: [
+                        "jTable-filter-button",
+                        `${tableID}-filter-button`,
+                        ...nameClasses_.map((a) => `${a}-filter-button`),
+                        ...(!tableOptions.filters ? ["dp-none"] : []),
+                    ],
+                    innerText: "Filters",
+                    onclick: () => {
+                        tableFiltersDropdownContainer.classList.toggle("dp-none");
+                    },
+                },
+                tableOptions.filtersOptions.buttonOptions,
+            ]);
+        let tableFiltersDropdownContainerTop = elements.createElement("div", {
+            pe: tableFiltersDropdownContainer,
+            classes: [
+                "jTable-filter-dropdown-container-top",
+                `${tableID}-filter-dropdown-container-top`,
+                ...nameClasses_.map((a) => `${a}-dropdown-container-top`),
+                ...(!tableOptions.filters ? ["dp-none"] : []),
+            ],
+        });
+        let tableFiltersDropdownContainerBottom = elements.createElement("div", {
+            pe: tableFiltersDropdownContainer,
+            classes: [
+                "jTable-filter-dropdown-container-bottom",
+                `${tableID}-filter-dropdown-container-bottom`,
+                ...nameClasses_.map((a) => `${a}-dropdown-container-bottom`),
+                ...(!tableOptions.filters ? ["dp-none"] : []),
+            ],
+        });
         let filters = [];
         if (tableOptions.filters) {
-            let tableFiltersButton = tableFilterContainerElem.querySelector(`.${tableID}-filter-button`) ??
-                elements.createElement("button", [
-                    {
-                        pe: tableFilterContainerElem,
-                        id: `${tableID}-filter-button`,
-                        classes: [
-                            "jTable-filter-button",
-                            `${tableID}-filter-button`,
-                            ...nameClasses_.map((a) => `${a}-filter-button`),
-                        ],
-                        innerText: "Filters",
-                        onclick: () => {
-                            tableFiltersDropdownContainer.classList.toggle("dp-none");
-                        },
-                    },
-                    tableOptions.filtersOptions.buttonOptions,
-                ]);
-            let tableFiltersDropdownContainerTop = elements.createElement("div", {
-                pe: tableFiltersDropdownContainer,
-                classes: [
-                    "jTable-filter-dropdown-container-top",
-                    `${tableID}-filter-dropdown-container-top`,
-                    ...nameClasses_.map((a) => `${a}-dropdown-container-top`),
-                ],
-            });
-            let tableFiltersDropdownContainerBottom = elements.createElement("div", {
-                pe: tableFiltersDropdownContainer,
-                classes: [
-                    "jTable-filter-dropdown-container-bottom",
-                    `${tableID}-filter-dropdown-container-bottom`,
-                    ...nameClasses_.map((a) => `${a}-dropdown-container-bottom`),
-                ],
-            });
             tableOptions.filtersOptions?.entries?.forEach((option) => {
                 let filterOption = {
                     attributeName: option.attributeName,
@@ -1077,7 +1097,21 @@ class elements {
             searchTable();
         }
         function updateEntriesDisplay() {
-            tableEntriesDisplay.innerText = `Found ${tableOptions.keys.filter((a) => a === "\n").length} results`;
+            if (!tableOptions.entriesDisplay)
+                return hideEntriesDisplay();
+            if (tableOptions.entriesDisplay === "filterOnly" &&
+                !searchData.query &&
+                filters.filter((a) => a.enabled).length === 0)
+                return hideEntriesDisplay();
+            let n = tableOptions.keys.filter((a) => a === "\n").length;
+            tableEntriesDisplay.innerText = `Found ${n} result${n === 1 ? "" : "s"}`;
+            showEntriesDisplay();
+            function hideEntriesDisplay() {
+                tableEntriesDisplayContainer.classList.add("dp-none");
+            }
+            function showEntriesDisplay() {
+                tableEntriesDisplayContainer.classList.remove("dp-none");
+            }
         }
         function appendFilters() {
             let usedKeys = tableOptions.keys;
@@ -1124,6 +1158,7 @@ class elements {
                 .forEach((a) => {
                 tableOptions.keys.push(...a, "\n");
             });
+            tableFiltersButton.innerText = `Filters (${filters.filter((a) => a.enabled).length})`;
             appendNoResults();
             actualCreateTable();
             updateEntriesDisplay();
