@@ -106,6 +106,12 @@ export class functions {
           break;
         }
 
+        case "ccb": {
+          options?.ccb?.(element);
+
+          break;
+        }
+
         default: {
           // @ts-ignore
           if (options[optionName]) element[optionName] = options[optionName];
@@ -329,6 +335,40 @@ export class functions {
 
     static emptyCache = () => {
       functions.localStorage.setKey("cache", {});
+    };
+  };
+
+  static listeners = class {
+    static keypressEnter = (
+      elem: HTMLElement,
+      ignoreShift?: boolean,
+      cb?: Function
+    ) => {
+      elem.onkeydown = (ev) => {
+        if (typeof ignoreShift === "function") {
+          cb = ignoreShift;
+          ignoreShift = true;
+        } else if (typeof ignoreShift !== "boolean") ignoreShift = true;
+        if (
+          (ev.key ? ev.key === "Enter" : ev.keyCode === 13) &&
+          (ignoreShift || !ev.shiftKey)
+        )
+          cb?.(ev);
+      };
+    };
+
+    static keyDown = (elem: HTMLElement, cb?: Function) => {
+      elem.onkeydown = (ev) => {
+        cb(ev);
+      };
+    };
+
+    static keyup = (elem: HTMLElement, cb?: Function) => {
+      elem.onkeyup = (ev) => cb(ev);
+    };
+
+    static keydown = (elem: HTMLElement, cb?: Function) => {
+      elem.onkeydown = (ev) => cb(ev);
     };
   };
 }
@@ -1321,26 +1361,28 @@ export class elements {
       });
 
       let sortModeOld = defaultSortOption?.sortMode ?? 1;
-      let tableSortDropdownModeButton = elements.createElement("button", {
-        classes: [
-          "dp-fl_ce",
-          "jTable-sortDropdownButton",
-          `${tableID}-sortDropdownButton`,
-          ...nameClasses_.map((a) => `${a}-sortDropdownButton`),
-        ],
-        childNodes: [
-          elements.createElement("img", {
-            classes: ["tableSortDropdownModeButtonImg"],
-            src:
-              tableOptions.dropdownButtonImgSrc ??
-              "https://cdn-0.emojis.wiki/emoji-pics/icons8/down-arrow-icons8.png",
-          }),
-        ],
-        onclick: () => {
-          changeSort();
-        },
-        pe: tableDropdownSortContainerElem,
-      });
+      let tableSortDropdownModeButton = !tableDropdownSortContainerElem
+        ? undefined
+        : elements.createElement("button", {
+            classes: [
+              "dp-fl_ce",
+              "jTable-sortDropdownButton",
+              `${tableID}-sortDropdownButton`,
+              ...nameClasses_.map((a) => `${a}-sortDropdownButton`),
+            ],
+            childNodes: [
+              elements.createElement("img", {
+                classes: ["tableSortDropdownModeButtonImg"],
+                src:
+                  tableOptions.dropdownButtonImgSrc ??
+                  "https://cdn-0.emojis.wiki/emoji-pics/icons8/down-arrow-icons8.png",
+              }),
+            ],
+            onclick: () => {
+              changeSort();
+            },
+            pe: tableDropdownSortContainerElem,
+          });
 
       function changeSort(sortMode?: number) {
         let option = currentSortOption ?? tableOptions.dropdownSortOptions[0];
@@ -1386,7 +1428,7 @@ export class elements {
             tableFiltersDropdownContainer.classList.toggle("dp-none");
           },
         },
-        tableOptions.filtersOptions.buttonOptions,
+        tableOptions?.filtersOptions?.buttonOptions ?? {},
       ]);
 
     let tableFiltersDropdownContainerTop = elements.createElement("div", {
@@ -1495,7 +1537,7 @@ export class elements {
       let usedKeys = tableOptions.keys;
       tableOptions.keys = [];
       let tableKeysOriginalLines = [[]];
-      usedKeys.forEach((a) => {
+      usedKeys?.forEach((a) => {
         if (a === "\n") return tableKeysOriginalLines.push([]);
         tableKeysOriginalLines.at(-1).push(a);
       });

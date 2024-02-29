@@ -10,6 +10,7 @@ export declare type elementOptionsExtra = {
     attributes?: Record<string, string>;
     interval?: elementOptionIntervalType;
     intervalTime?: number;
+    ccb?: (elem: HTMLElement) => void;
 };
 export declare type elementOptionIntervalType = (el?: HTMLElement) => void;
 export declare type elementOptions = elementOptionsExtra & Record<string, any>;
@@ -65,7 +66,7 @@ export declare type notificationOptionsType = {
     onclose?: (byUser?: boolean) => void;
 };
 export declare type tableOptionsType = {
-    names: string[];
+    names?: string[];
     keys: any[];
     tableName?: string;
     noClearTable?: boolean;

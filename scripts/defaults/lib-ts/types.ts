@@ -13,6 +13,7 @@ export type elementOptionsExtra = {
   attributes?: Record<string, string>;
   interval?: elementOptionIntervalType;
   intervalTime?: number;
+  ccb?: (elem: HTMLElement) => void;
 };
 
 export type elementOptionIntervalType = (el?: HTMLElement) => void;
@@ -82,7 +83,7 @@ export type notificationOptionsType = {
 };
 
 export type tableOptionsType = {
-  names: string[];
+  names?: string[];
   keys: any[];
   tableName?: string;
   noClearTable?: boolean;

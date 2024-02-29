@@ -37,6 +37,13 @@ export declare class functions {
         deleteKey: (keypath: any) => void;
         emptyCache: () => void;
     };
+    static listeners: {
+        new (): {};
+        keypressEnter: (elem: HTMLElement, ignoreShift?: boolean, cb?: Function) => void;
+        keyDown: (elem: HTMLElement, cb?: Function) => void;
+        keyup: (elem: HTMLElement, cb?: Function) => void;
+        keydown: (elem: HTMLElement, cb?: Function) => void;
+    };
 }
 export declare class elements {
     #private;
