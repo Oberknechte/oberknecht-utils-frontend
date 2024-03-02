@@ -7,6 +7,7 @@ const arrayModifiers_js_1 = require("oberknecht-utils/lib-js/utils/arrayModifier
 const isNullUndefined_js_1 = require("oberknecht-utils/lib-js/utils/isNullUndefined.js");
 const defaults_2 = require("../../defaults/lib-ts/defaults");
 let jChooseNum = 0;
+let selectContainers = {};
 class jChoose {
     #sym = `jChoose-${jChooseNum++}`;
     get symbol() {
@@ -14,21 +15,27 @@ class jChoose {
     }
     #selectContainers;
     #options;
-    #chooseOptions = [];
+    #chooseOptions = {};
+    get chooseOptions() {
+        if (!this.#chooseOptions[this.symbol])
+            this.#chooseOptions[this.symbol] = [];
+        return this.#chooseOptions[this.symbol] ?? [];
+    }
     constructor() { }
     choose = (options) => {
+        this.#sym = `jChoose-${jChooseNum++}`;
         this.#options = options ?? {};
-        this.#selectContainers = [];
-        [
-            ...(0, convertToArray_js_1.convertToArray)(this.#options.appendSelectors, false),
-            ...defaults_1.defaultAppendClasses.map((a) => `.${a}`),
-        ].forEach((selector) => {
+        selectContainers[this.symbol] = [];
+        ((0, convertToArray_js_1.convertToArray)(this.#options.appendSelectors, false, true) ??
+            defaults_1.defaultAppendClasses.map((a) => `.${a}`))
+            .filter((a, i, arr) => !arr.slice(0, i).includes(a))
+            .forEach((selector) => {
             // @ts-ignore
-            this.#selectContainers.push(...(selector instanceof HTMLElement
+            selectContainers[this.symbol].push(...(selector instanceof HTMLElement
                 ? [selector]
                 : document.querySelectorAll(selector)));
         });
-        this.#selectContainers.forEach((a) => this.createChoose(a));
+        selectContainers[this.symbol].forEach((a) => this.createChoose(a));
     };
     createChoose = (originalSelect) => {
         let this_ = this;
@@ -36,7 +43,7 @@ class jChoose {
             return;
         let chooseContainer = defaults_2.elements.createElement("div", {
             classes: ["jChoose-container"],
-            id: `jChoose-${originalSelect.id}`,
+            id: originalSelect.id ? `jChoose-${originalSelect.id}` : this.symbol,
         });
         let chooseSelected = defaults_2.elements.createElement("div", {
             classes: ["jChoose-selected"],
@@ -52,18 +59,19 @@ class jChoose {
                 name: optionElem.innerText,
                 value: optionElem.value,
                 optionElem: optionElem,
-            });
+            }, true);
         });
-        function appendOption(optionOptions) {
+        function appendOption(optionOptions, fromBase) {
             if (optionOptions.value.length === 0 ||
                 (this_.#options.minLength &&
                     optionOptions.value.length < this_.#options.minLength) ||
                 (this_.#options.maxLength &&
                     optionOptions.value.length > this_.#options.maxLength) ||
                 (!this_.#options.allowDuplicates &&
-                    this_.#chooseOptions.some((a) => a.value === optionOptions.value)))
+                    this_.chooseOptions.some((a) => a.value === optionOptions.value)))
                 return;
-            if (this_.#options.addValidation &&
+            if (!fromBase &&
+                this_.#options.addValidation &&
                 !this_.#options.addValidation(optionOptions.value))
                 return;
             let chooseOptionContainer = defaults_2.elements.createElement("div", {
@@ -91,9 +99,9 @@ class jChoose {
                 elem: chooseOptionContainer,
                 optionElem: optionOptions.optionElem ?? chooseSelectOption,
             };
-            this_.#chooseOptions.push(d);
+            this_.#chooseOptions[this_.symbol].push(d);
             chooseOptionDelete.onclick = () => {
-                removeOption(this_.#chooseOptions.indexOf(d));
+                removeOption(this_.chooseOptions.indexOf(d));
             };
             defaults_2.functions.appendChildren(chooseOptionContainerInner, chooseOptionName, chooseOptionDelete);
             defaults_2.functions.appendChildren(chooseOptionContainer, chooseOptionContainerInner);
@@ -102,11 +110,11 @@ class jChoose {
                 defaults_2.functions.appendChildren(originalSelect, chooseSelectOption);
         }
         function removeOption(index) {
-            if (this_.#chooseOptions.length === 0)
+            if (this_.chooseOptions.length === 0)
                 return;
-            index = !(0, isNullUndefined_js_1.isNullUndefined)(index) ? index : this_.#chooseOptions.length - 1;
-            let optionOptions = this_.#chooseOptions[index];
-            this_.#chooseOptions = arrayModifiers_js_1.arrayModifiers.splice(this_.#chooseOptions, index, 1);
+            index = !(0, isNullUndefined_js_1.isNullUndefined)(index) ? index : this_.chooseOptions.length - 1;
+            let optionOptions = this_.chooseOptions[index];
+            this_.#chooseOptions[this_.symbol] = arrayModifiers_js_1.arrayModifiers.splice(this_.chooseOptions, index, 1);
             optionOptions.elem.remove();
             optionOptions.optionElem.remove();
             // arrayModifiers.splice(chooseOptionsSelected, index);
@@ -138,7 +146,7 @@ class jChoose {
         originalSelect.style.display = "none";
     };
     values = () => {
-        return this.#chooseOptions.map((a) => a.value);
+        return this.chooseOptions.map((a) => a.value);
     };
 }
 exports.jChoose = jChoose;

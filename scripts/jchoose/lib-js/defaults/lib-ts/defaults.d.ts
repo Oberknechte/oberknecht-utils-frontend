@@ -1,4 +1,4 @@
-import { copyOptionsType, elemType, elementOptions, functionsSettingsType, getElementType, jPopoutType, notificationOptionsType, popoutOptionsType, sortTableOptionsType, tableOptionsType, timeUnitInputOptionsType, version } from "./types";
+import { copyOptionsType, createSwitchOptions, elemType, elementOptions, functionsSettingsType, getElementType, jPopoutType, notificationOptionsType, popoutOptionsType, sortTableOptionsType, tableOptionsType, timeUnitInputOptionsType, version } from "./types";
 import { jChoose } from "../../jchoose/lib-ts/jchoose";
 export declare class functions {
     static url: URL;
@@ -10,6 +10,7 @@ export declare class functions {
     static getParent: (elem: HTMLElement, number?: number) => any;
     static getElement: (elemOrQuery: elemType | string) => HTMLElement;
     static getElements: (elemsOrQuerys: (elemType | string) | (elemType | string)[]) => HTMLElement[];
+    static getParentWithClass: (elem: getElementType, searchClass: string, includeElem?: boolean, maxParentNodes?: number) => any;
     static parseIconURL: (u: string, size?: string) => string;
     static copy: (elemOrData: any, copyOptions_?: copyOptionsType) => Promise<void>;
     static isHTMLElement: (elem: any) => boolean;
@@ -24,10 +25,29 @@ export declare class functions {
     static toNumber: (inp: string | number) => number;
     static convertUnitToTime: (unit_: string, value: string | number) => number;
     static undefinedOnEmptyString: (s: string) => string;
+    static localStorage: {
+        new (): {};
+        key: string;
+        init: () => void;
+        initIfNonexistent: () => void;
+        getStorage: () => any;
+        setStorage: (newStorage: any) => void;
+        getKey: (keypath: any) => any;
+        setKey: (keypath: any, value: any) => void;
+        deleteKey: (keypath: any) => void;
+        emptyCache: () => void;
+    };
+    static listeners: {
+        new (): {};
+        keypressEnter: (elem: HTMLElement, ignoreShift?: boolean, cb?: Function) => void;
+        keyDown: (elem: HTMLElement, cb?: Function) => void;
+        keyup: (elem: HTMLElement, cb?: Function) => void;
+        keydown: (elem: HTMLElement, cb?: Function) => void;
+    };
 }
 export declare class elements {
     #private;
-    static createElement: <K extends string>(tagName: string | K, options?: elementOptions) => K extends keyof HTMLElementTagNameMap ? HTMLElementTagNameMap[K] : HTMLElement;
+    static createElement: <K extends string>(tagName: string | K, options?: elementOptions | elementOptions[]) => K extends keyof HTMLElementTagNameMap ? HTMLElementTagNameMap[K] : HTMLElement;
     static parseLinks: (elemOrQuery: getElementType, target?: string, useMarkdownLinks?: boolean) => void;
     static parseADHD: (elemOrQuery: HTMLElement | string, boldLength?: number, noIgnoreLinks?: boolean, ignoreCheck?: Function) => void;
     static parseJSONText: (s: string | Record<string, any>) => string;
@@ -38,9 +58,11 @@ export declare class elements {
     static closeNotification: (notificationContainerElem?: elemType) => Promise<void>;
     static closeNotificationsAll: () => void;
     static closeErrorNotification: () => void;
-    static createTable: (tableOptions: tableOptionsType) => HTMLTableElement;
+    static createTable: (tableOptions: tableOptionsType) => HTMLDivElement;
     static sortTable: (options: sortTableOptionsType) => void;
     static timeUnitInput: (options: timeUnitInputOptionsType) => HTMLDivElement;
+    static createSwitch: (switchOptionsOrEnabled?: createSwitchOptions | boolean, changeCallback?: Function) => HTMLDivElement;
+    static hasParentAny: (elem: HTMLElement | EventTarget, parentElem: HTMLElement) => boolean;
     static jChoose: typeof jChoose;
 }
 export declare class elementModifiers {

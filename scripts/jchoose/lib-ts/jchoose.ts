@@ -32,7 +32,7 @@ export class jChoose {
     this.#options = options ?? {};
     selectContainers[this.symbol] = [];
     (
-      convertToArray(this.#options.appendSelectors, true) ??
+      convertToArray(this.#options.appendSelectors, false, true) ??
       defaultAppendClasses.map((a) => `.${a}`)
     )
       .filter((a, i, arr) => !arr.slice(0, i).includes(a))
@@ -70,15 +70,21 @@ export class jChoose {
     // @ts-ignore
     [...originalSelect.querySelectorAll("option")].forEach(
       (optionElem: HTMLOptionElement) => {
-        appendOption({
-          name: optionElem.innerText,
-          value: optionElem.value,
-          optionElem: optionElem,
-        });
+        appendOption(
+          {
+            name: optionElem.innerText,
+            value: optionElem.value,
+            optionElem: optionElem,
+          },
+          true
+        );
       }
     );
 
-    function appendOption(optionOptions: jChooseOptionOption) {
+    function appendOption(
+      optionOptions: jChooseOptionOption,
+      fromBase?: boolean
+    ) {
       if (
         optionOptions.value.length === 0 ||
         (this_.#options.minLength &&
@@ -93,6 +99,7 @@ export class jChoose {
         return;
 
       if (
+        !fromBase &&
         this_.#options.addValidation &&
         !this_.#options.addValidation(optionOptions.value)
       )
