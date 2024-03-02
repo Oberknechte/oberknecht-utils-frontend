@@ -7,6 +7,7 @@ export type jChooseOptions = {
   disallowedCharsRegExp?: RegExp;
   disallowedCharsReplacement?: string;
   addValidation?: Function;
+  changeCb?: Function;
 };
 
 export type jChooseOptionOption = {

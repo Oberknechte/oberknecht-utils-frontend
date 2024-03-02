@@ -1,4 +1,4 @@
-export declare type jChooseOptions = {
+export type jChooseOptions = {
     appendSelectors?: string | string[];
     placeholder?: string;
     minLength?: number;
@@ -7,14 +7,15 @@ export declare type jChooseOptions = {
     disallowedCharsRegExp?: RegExp;
     disallowedCharsReplacement?: string;
     addValidation?: Function;
+    changeCb?: Function;
 };
-export declare type jChooseOptionOption = {
+export type jChooseOptionOption = {
     value: string;
     name?: string;
     optionElem?: HTMLOptionElement;
     withoutRemove?: boolean;
 };
-export declare type jChooseOptionsOptionArr = jChooseOptionOption & {
+export type jChooseOptionsOptionArr = jChooseOptionOption & {
     elem: HTMLDivElement;
     optionElem: HTMLOptionElement;
 };

@@ -17,7 +17,10 @@ export class jChoose {
     return this.#sym;
   }
   #selectContainers: HTMLSelectElement[];
-  #options: jChooseOptions;
+  #options: Record<string, jChooseOptions> = {};
+  get options() {
+    return this.#options[this.#sym];
+  }
   #chooseOptions: Record<string, jChooseOptionOptionArr[]> = {};
   get chooseOptions() {
     if (!this.#chooseOptions[this.symbol])
@@ -29,10 +32,10 @@ export class jChoose {
 
   choose = (options?: jChooseOptions) => {
     this.#sym = `jChoose-${jChooseNum++}`;
-    this.#options = options ?? {};
+    this.#options[this.#sym] = options ?? {};
     selectContainers[this.symbol] = [];
     (
-      convertToArray(this.#options.appendSelectors, false, true) ??
+      convertToArray(this.#options[this.#sym].appendSelectors, false, true) ??
       defaultAppendClasses.map((a) => `.${a}`)
     )
       .filter((a, i, arr) => !arr.slice(0, i).includes(a))
@@ -87,11 +90,11 @@ export class jChoose {
     ) {
       if (
         optionOptions.value.length === 0 ||
-        (this_.#options.minLength &&
-          optionOptions.value.length < this_.#options.minLength) ||
-        (this_.#options.maxLength &&
-          optionOptions.value.length > this_.#options.maxLength) ||
-        (!this_.#options.allowDuplicates &&
+        (this_.#options[this_.#sym].minLength &&
+          optionOptions.value.length < this_.#options[this_.#sym].minLength) ||
+        (this_.#options[this_.#sym].maxLength &&
+          optionOptions.value.length > this_.#options[this_.#sym].maxLength) ||
+        (!this_.#options[this_.#sym].allowDuplicates &&
           this_.chooseOptions.some(
             (a: jChooseOptionOptionArr) => a.value === optionOptions.value
           ))
@@ -100,8 +103,11 @@ export class jChoose {
 
       if (
         !fromBase &&
-        this_.#options.addValidation &&
-        !this_.#options.addValidation(optionOptions.value)
+        this_.#options[this_.#sym].addValidation &&
+        !this_.#options[this_.#sym].addValidation(
+          optionOptions.value,
+          this_.values()
+        )
       )
         return;
 
@@ -155,6 +161,8 @@ export class jChoose {
       functions.appendChildren(chooseSelected, chooseOptionContainer);
       if (!optionOptions.optionElem)
         functions.appendChildren(originalSelect, chooseSelectOption);
+
+      if (!fromBase) this_.options.changeCb?.();
     }
 
     function removeOption(index?: number) {
@@ -170,6 +178,7 @@ export class jChoose {
       optionOptions.elem.remove();
       optionOptions.optionElem.remove();
       // arrayModifiers.splice(chooseOptionsSelected, index);
+      this_.options.changeCb?.();
     }
 
     (() => {
@@ -177,10 +186,10 @@ export class jChoose {
 
       chooseInput.onkeydown = (ev) => {
         inputValue = chooseInput.value;
-        if (this.#options.disallowedCharsRegExp)
+        if (this.#options[this.#sym].disallowedCharsRegExp)
           inputValue = inputValue.replace(
-            this.#options.disallowedCharsRegExp,
-            this.#options.disallowedCharsReplacement ?? ""
+            this.#options[this.#sym].disallowedCharsRegExp,
+            this.#options[this.#sym].disallowedCharsReplacement ?? ""
           );
 
         switch (ev.key) {
