@@ -2,6 +2,7 @@ import { jChooseOptions, jChooseOptionsOptionArr as jChooseOptionOptionArr } fro
 export declare class jChoose {
     #private;
     get symbol(): string;
+    get options(): jChooseOptions;
     get chooseOptions(): jChooseOptionOptionArr[];
     constructor();
     choose: (options?: jChooseOptions) => void;

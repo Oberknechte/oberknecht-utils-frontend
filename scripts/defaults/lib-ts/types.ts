@@ -106,6 +106,7 @@ export type tableOptionsType = {
     buttonOptions?: elementOptions;
   };
   entriesDisplay?: boolean | "filterOnly";
+  noAutoFillNames?: boolean;
 };
 
 export type tableOptionsDropdownSortOptionEntry = {

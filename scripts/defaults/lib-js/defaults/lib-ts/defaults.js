@@ -930,6 +930,14 @@ class elements {
                 lastSortIndex: undefined,
                 sortMode: undefined,
             };
+            if (!tableOptions.noAutoFillNames)
+                tableOptions.names = [
+                    ...tableOptions.names,
+                    ...[
+                        ...Array(tableOptions.keys.slice(0, (tableOptions.keys.indexOf("\n") ??
+                            tableOptions.keys.length - 1) - 1).length),
+                    ].map((a) => ""),
+                ];
             tableOptions.names.forEach((name, i) => {
                 let th = elements.createElement("th", {
                     classes: [

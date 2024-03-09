@@ -89,6 +89,7 @@ export declare type tableOptionsType = {
         buttonOptions?: elementOptions;
     };
     entriesDisplay?: boolean | "filterOnly";
+    noAutoFillNames?: boolean;
 };
 export declare type tableOptionsDropdownSortOptionEntry = {
     name: string;

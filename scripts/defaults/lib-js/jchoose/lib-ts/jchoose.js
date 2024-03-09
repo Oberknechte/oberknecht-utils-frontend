@@ -14,7 +14,10 @@ class jChoose {
         return this.#sym;
     }
     #selectContainers;
-    #options;
+    #options = {};
+    get options() {
+        return this.#options[this.#sym];
+    }
     #chooseOptions = {};
     get chooseOptions() {
         if (!this.#chooseOptions[this.symbol])
@@ -24,9 +27,9 @@ class jChoose {
     constructor() { }
     choose = (options) => {
         this.#sym = `jChoose-${jChooseNum++}`;
-        this.#options = options ?? {};
+        this.#options[this.#sym] = options ?? {};
         selectContainers[this.symbol] = [];
-        ((0, convertToArray_js_1.convertToArray)(this.#options.appendSelectors, true) ??
+        ((0, convertToArray_js_1.convertToArray)(this.#options[this.#sym].appendSelectors, false, true) ??
             defaults_1.defaultAppendClasses.map((a) => `.${a}`))
             .filter((a, i, arr) => !arr.slice(0, i).includes(a))
             .forEach((selector) => {
@@ -59,19 +62,20 @@ class jChoose {
                 name: optionElem.innerText,
                 value: optionElem.value,
                 optionElem: optionElem,
-            });
+            }, true);
         });
-        function appendOption(optionOptions) {
+        function appendOption(optionOptions, fromBase) {
             if (optionOptions.value.length === 0 ||
-                (this_.#options.minLength &&
-                    optionOptions.value.length < this_.#options.minLength) ||
-                (this_.#options.maxLength &&
-                    optionOptions.value.length > this_.#options.maxLength) ||
-                (!this_.#options.allowDuplicates &&
+                (this_.#options[this_.#sym].minLength &&
+                    optionOptions.value.length < this_.#options[this_.#sym].minLength) ||
+                (this_.#options[this_.#sym].maxLength &&
+                    optionOptions.value.length > this_.#options[this_.#sym].maxLength) ||
+                (!this_.#options[this_.#sym].allowDuplicates &&
                     this_.chooseOptions.some((a) => a.value === optionOptions.value)))
                 return;
-            if (this_.#options.addValidation &&
-                !this_.#options.addValidation(optionOptions.value))
+            if (!fromBase &&
+                this_.#options[this_.#sym].addValidation &&
+                !this_.#options[this_.#sym].addValidation(optionOptions.value, this_.values()))
                 return;
             let chooseOptionContainer = defaults_2.elements.createElement("div", {
                 classes: ["jChoose-select"],
@@ -107,6 +111,8 @@ class jChoose {
             defaults_2.functions.appendChildren(chooseSelected, chooseOptionContainer);
             if (!optionOptions.optionElem)
                 defaults_2.functions.appendChildren(originalSelect, chooseSelectOption);
+            if (!fromBase)
+                this_.options.changeCb?.();
         }
         function removeOption(index) {
             if (this_.chooseOptions.length === 0)
@@ -117,13 +123,14 @@ class jChoose {
             optionOptions.elem.remove();
             optionOptions.optionElem.remove();
             // arrayModifiers.splice(chooseOptionsSelected, index);
+            this_.options.changeCb?.();
         }
         (() => {
             let inputValue = "";
             chooseInput.onkeydown = (ev) => {
                 inputValue = chooseInput.value;
-                if (this.#options.disallowedCharsRegExp)
-                    inputValue = inputValue.replace(this.#options.disallowedCharsRegExp, this.#options.disallowedCharsReplacement ?? "");
+                if (this.#options[this.#sym].disallowedCharsRegExp)
+                    inputValue = inputValue.replace(this.#options[this.#sym].disallowedCharsRegExp, this.#options[this.#sym].disallowedCharsReplacement ?? "");
                 switch (ev.key) {
                     case "Enter": {
                         appendOption({

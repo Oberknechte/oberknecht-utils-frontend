@@ -7,6 +7,7 @@ export declare type jChooseOptions = {
     disallowedCharsRegExp?: RegExp;
     disallowedCharsReplacement?: string;
     addValidation?: Function;
+    changeCb?: Function;
 };
 export declare type jChooseOptionOption = {
     value: string;
