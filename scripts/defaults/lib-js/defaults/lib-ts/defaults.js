@@ -492,7 +492,7 @@ class elements {
         (() => {
             let notificationTextElem = elements.createElement("jh", {
                 classes: ["jnotification-text"],
-                innerText: isErr ? "Error: " + (0, utils_1.returnErr)(dat) : dat,
+                innerText: isErr ? (0, utils_1.returnErr)(dat) ?? "Error" : dat,
             });
             let notificationButtonContainer = elements.createElement("div", {
                 classes: ["jnotification-buttoncontainer"],

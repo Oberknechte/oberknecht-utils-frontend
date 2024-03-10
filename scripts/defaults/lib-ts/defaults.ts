@@ -713,7 +713,7 @@ export class elements {
     (() => {
       let notificationTextElem = elements.createElement("jh", {
         classes: ["jnotification-text"],
-        innerText: isErr ? "Error: " + returnErr(dat) : dat,
+        innerText: isErr ? returnErr(dat) ?? "Error" : dat,
       });
 
       let notificationButtonContainer = elements.createElement("div", {
@@ -1734,7 +1734,7 @@ export class elements {
           ...tableOptions.sortOptions,
         });
 
-      tableExists = true;     
+      tableExists = true;
     }
 
     actualCreateTable();
