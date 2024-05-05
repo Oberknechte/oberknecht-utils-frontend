@@ -268,7 +268,7 @@ exports.functions = functions;
 class elements {
     static createElement = (tagName, options) => {
         let r = document.createElement(tagName);
-        let options_ = (0, utils_1.concatJSON)((0, utils_1.convertToArray)(options).filter((a) => !!a), ["array", "json", "object"]);
+        let options_ = (0, utils_1.concatJSON)((0, utils_1.convertToArray)(options, false, true).filter((a) => !!a), ["array", "json", "object"]);
         functions.appendElementOptions(r, options_);
         // @ts-ignore
         return r;
@@ -609,7 +609,7 @@ class elements {
         tableOptions.names = tableOptions.names ?? [];
         tableOptions.keys = tableOptions.keys ?? [];
         tableOptions.tableName = tableOptions.tableName ?? "jTable";
-        tableOptions.pe = tableOptions.parentElem ?? tableOptions.pe ?? undefined;
+        tableOptions.pe = tableOptions.pe ?? tableOptions.parentElem ?? undefined;
         tableOptions.nameClasses = tableOptions.nameClasses ?? [];
         tableOptions.sortOptions =
             tableOptions.sortOptions ?? {};

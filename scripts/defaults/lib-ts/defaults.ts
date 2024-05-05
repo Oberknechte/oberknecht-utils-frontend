@@ -383,7 +383,7 @@ export class elements {
     let r = document.createElement(tagName);
 
     let options_ = concatJSON(
-      convertToArray(options).filter((a) => !!a),
+      convertToArray(options, false, true).filter((a) => !!a),
       ["array", "json", "object"]
     );
     functions.appendElementOptions(r, options_);
@@ -871,7 +871,7 @@ export class elements {
     tableOptions.names = tableOptions.names ?? [];
     tableOptions.keys = tableOptions.keys ?? [];
     tableOptions.tableName = tableOptions.tableName ?? "jTable";
-    tableOptions.pe = tableOptions.parentElem ?? tableOptions.pe ?? undefined;
+    tableOptions.pe = tableOptions.pe ?? tableOptions.parentElem ?? undefined;
     tableOptions.nameClasses = tableOptions.nameClasses ?? [];
     tableOptions.sortOptions =
       tableOptions.sortOptions ?? ({} as sortTableOptionsType);
@@ -886,9 +886,10 @@ export class elements {
       )
       .filter((a, i, arr) => i < arr.length - 1 || a !== "\n");
 
-    let tableOptionsOriginal = recreate(tableOptions) as tableOptionsType;
-
-    let tableID = tableOptions.tableName;
+      
+      let tableOptionsOriginal = recreate(tableOptions) as tableOptionsType;
+      
+      let tableID = tableOptions.tableName;
     let nameClasses_ = [tableID, ...convertToArray(tableOptions.nameClasses)];
 
     let tableExists =
