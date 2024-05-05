@@ -1,6 +1,6 @@
 {
   "name": "oberknecht-utils-frontend",
-  "version": "0.8.5",
+  "version": "0.8.6",
   "description": "",
   "main": "",
   "scripts": {
@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/Oberknechte/oberknecht-utils-frontend#readme",
   "dependencies": {
-    "oberknecht-utils": "^1.9.0"
+    "oberknecht-utils": "^1.9.2"
   },
   "devDependencies": {
     "css-loader": "^6.8.1",
