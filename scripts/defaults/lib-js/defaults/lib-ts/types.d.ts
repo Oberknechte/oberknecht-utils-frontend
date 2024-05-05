@@ -2,7 +2,7 @@ export declare const defaultExitIconURL: "https://raw.githubusercontent.com/Ober
 export declare const defaultCopyAnimationDuration: 5000;
 export declare const defaultNotificationAnimationDuration: 5000;
 export declare const defaultNotificationErrorAnimationDuration: -1;
-export declare type elementOptionsExtra = {
+export type elementOptionsExtra = {
     classes?: string | string[];
     childNodes?: HTMLElement | HTMLElement[];
     pe?: getElementType;
@@ -12,23 +12,23 @@ export declare type elementOptionsExtra = {
     intervalTime?: number;
     ccb?: (elem: HTMLElement) => void;
 };
-export declare type elementOptionIntervalType = (el?: HTMLElement) => void;
-export declare type elementOptions = elementOptionsExtra & Record<string, any>;
-export declare type version = {
+export type elementOptionIntervalType = (el?: HTMLElement) => void;
+export type elementOptions = elementOptionsExtra & Record<string, any>;
+export type version = {
     npm: string;
 };
-export declare type jPopoutType = HTMLElement & {
+export type jPopoutType = HTMLElement & {
     closePopout: () => void;
 };
-export declare type elemType = HTMLElement | Element;
-export declare type getElementType = elemType | string;
-export declare type functionsSettingsType = {
+export type elemType = HTMLElement | Element;
+export type getElementType = elemType | string;
+export type functionsSettingsType = {
     iconSize?: number | 48;
     popoutOptions?: popoutOptionsType;
     copyOptions?: copyOptionsType;
     notificationOptions?: notificationOptionsType;
 };
-export declare type popoutOptionsType = {
+export type popoutOptionsType = {
     title?: string;
     innerElems?: elemType | elemType[];
     parentElem?: HTMLElement;
@@ -44,14 +44,14 @@ export declare type popoutOptionsType = {
     onClosed?: Function;
     noAppendParentClass?: boolean;
 };
-export declare type copyOptionsType = {
+export type copyOptionsType = {
     withoutAnimation?: boolean;
     customDataAttributeKey?: string;
     animationParentsNum?: number;
     animationDuration?: number | typeof defaultCopyAnimationDuration;
 };
-export declare type jNotificationType = jPopoutType;
-export declare type notificationOptionsType = {
+export type jNotificationType = jPopoutType;
+export type notificationOptionsType = {
     exitIconURL?: string;
     isError?: boolean;
     parentElem?: elemType;
@@ -65,7 +65,7 @@ export declare type notificationOptionsType = {
     elementOptions?: elementOptions;
     onclose?: (byUser?: boolean) => void;
 };
-export declare type tableOptionsType = {
+export type tableOptionsType = {
     names?: string[];
     keys: any[];
     tableName?: string;
@@ -91,14 +91,14 @@ export declare type tableOptionsType = {
     entriesDisplay?: boolean | "filterOnly";
     noAutoFillNames?: boolean;
 };
-export declare type tableOptionsDropdownSortOptionEntry = {
+export type tableOptionsDropdownSortOptionEntry = {
     name: string;
     tdNum: number;
     sortMode: 1 | 2 | number;
     attributeName?: string;
     default?: boolean;
 };
-export declare type tableOptionsFiltersEntry = {
+export type tableOptionsFiltersEntry = {
     name: string;
     attributeName: string;
     value?: string;
@@ -108,7 +108,7 @@ export declare type tableOptionsFiltersEntry = {
     tdNums?: number | number[];
     entryOptions?: elementOptions;
 };
-export declare type tableOptionsFilterEntryInternal = {
+export type tableOptionsFilterEntryInternal = {
     attributeName: string;
     value?: string;
     enabled?: boolean;
@@ -116,15 +116,15 @@ export declare type tableOptionsFilterEntryInternal = {
     method?: "includes";
     splitter?: string;
 };
-declare type tableSearchCallbackFunctionResolveType = {
+type tableSearchCallbackFunctionResolveType = {
     keys: any[];
 };
-declare type tableSearchCallbackFunctionPromiseType = Promise<tableSearchCallbackFunctionResolveType>;
-declare type tableSearchCallbackFunctionType = (callbackSearchData: {
+type tableSearchCallbackFunctionPromiseType = Promise<tableSearchCallbackFunctionResolveType>;
+type tableSearchCallbackFunctionType = (callbackSearchData: {
     query: string;
     queryRegex: typeof RegExp;
 }) => tableSearchCallbackFunctionPromiseType;
-export declare type tableSearchOptionsType = {
+export type tableSearchOptionsType = {
     callback?: tableSearchCallbackFunctionType;
     inputPlaceholder?: string;
     searchStopDelay?: number;
@@ -133,19 +133,19 @@ export declare type tableSearchOptionsType = {
     tdAttributes?: string[];
     allowRegexQuery?: boolean;
 };
-export declare type sortTableOptionsType = {
+export type sortTableOptionsType = {
     table?: HTMLTableElement;
     tdNum?: number;
     sortMode?: number | 1 | 2;
     reverseIfSame?: boolean;
     sortAttributeNames?: string | string[];
 };
-export declare type timeUnitInputOptionsType = {
+export type timeUnitInputOptionsType = {
     value: number;
     changeCallback: Function;
     minValue?: number;
 };
-export declare type createSwitchOptions = {
+export type createSwitchOptions = {
     enabled?: boolean;
     changeCallback?: Function;
     stateOnReject?: boolean;
