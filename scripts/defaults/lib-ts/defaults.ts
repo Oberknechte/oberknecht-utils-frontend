@@ -886,10 +886,9 @@ export class elements {
       )
       .filter((a, i, arr) => i < arr.length - 1 || a !== "\n");
 
-      
-      let tableOptionsOriginal = recreate(tableOptions) as tableOptionsType;
-      
-      let tableID = tableOptions.tableName;
+    let tableOptionsOriginal = recreate(tableOptions) as tableOptionsType;
+
+    let tableID = tableOptions.tableName;
     let nameClasses_ = [tableID, ...convertToArray(tableOptions.nameClasses)];
 
     let tableExists =
@@ -1242,16 +1241,17 @@ export class elements {
     let tableNamesElem: HTMLTableElement =
       (tableContainerTop.querySelector(
         `#${tableID}-names`
-      ) as HTMLTableElement) ??
-      elements.createElement("table", {
-        id: `${tableID}-names`,
-        pe: tableContainerTop,
-        classes: [
-          "jTable-names",
-          `${tableID}-names`,
-          ...nameClasses_.map((a) => `${a}-names`),
-        ],
-      });
+      ) as HTMLTableElement) ?? tableOptions.namesInTopTable
+        ? elements.createElement("table", {
+            id: `${tableID}-names`,
+            pe: tableContainerTop,
+            classes: [
+              "jTable-names",
+              `${tableID}-names`,
+              ...nameClasses_.map((a) => `${a}-names`),
+            ],
+          })
+        : undefined;
 
     let tableElem: HTMLTableElement =
       (tableContainerBottom.querySelector(`#${tableID}`) as HTMLTableElement) ??
@@ -1272,15 +1272,18 @@ export class elements {
       if (!tableOptions.noAutoFillNames)
         tableOptions.names = [
           ...tableOptions.names,
-          ...[
-            ...Array(
-              tableOptions.keys.slice(
-                0,
-                (tableOptions.keys.indexOf("\n") ??
-                  tableOptions.keys.length - 1) - 1
-              ).length
-            ),
-          ].map((a) => ""),
+          ...(tableOptions.keys.indexOf("\n") < tableOptions.names.length - 1
+            ? [
+                ...Array(
+                  tableOptions.keys.slice(
+                    0,
+                    tableOptions.keys.indexOf("\n") !== -1
+                      ? tableOptions.keys.indexOf("\n") - 1
+                      : tableOptions.keys.length - 1
+                  ).length
+                ),
+              ].map((a) => "")
+            : []),
         ];
 
       tableOptions.names.forEach((name: string, i) => {
@@ -1333,7 +1336,11 @@ export class elements {
         thtr.appendChild(th);
       });
 
-      if (tableOptions.names.length > 0) tableNamesElem.appendChild(thtr);
+      if (tableOptions.names.length > 0 && tableOptions.namesInTopTable) {
+        tableNamesElem.appendChild(thtr);
+      } else {
+        tableElem.appendChild(thtr);
+      }
     }
 
     if (tableOptions.dropdownSort) {

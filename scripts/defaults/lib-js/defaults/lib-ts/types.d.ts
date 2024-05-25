@@ -90,6 +90,7 @@ export type tableOptionsType = {
     };
     entriesDisplay?: boolean | "filterOnly";
     noAutoFillNames?: boolean;
+    namesInTopTable?: boolean;
 };
 export type tableOptionsDropdownSortOptionEntry = {
     name: string;

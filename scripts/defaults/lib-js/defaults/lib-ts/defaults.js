@@ -908,8 +908,8 @@ class elements {
             tableOptions.keys = tableOptionsOriginal.keys;
             appendFilters();
         }
-        let tableNamesElem = tableContainerTop.querySelector(`#${tableID}-names`) ??
-            elements.createElement("table", {
+        let tableNamesElem = (tableContainerTop.querySelector(`#${tableID}-names`) ?? tableOptions.namesInTopTable)
+            ? elements.createElement("table", {
                 id: `${tableID}-names`,
                 pe: tableContainerTop,
                 classes: [
@@ -917,7 +917,8 @@ class elements {
                     `${tableID}-names`,
                     ...nameClasses_.map((a) => `${a}-names`),
                 ],
-            });
+            })
+            : undefined;
         let tableElem = tableContainerBottom.querySelector(`#${tableID}`) ??
             elements.createElement("table", {
                 id: tableID,
@@ -933,10 +934,13 @@ class elements {
             if (!tableOptions.noAutoFillNames)
                 tableOptions.names = [
                     ...tableOptions.names,
-                    ...[
-                        ...Array(tableOptions.keys.slice(0, (tableOptions.keys.indexOf("\n") ??
-                            tableOptions.keys.length - 1) - 1).length),
-                    ].map((a) => ""),
+                    ...(tableOptions.keys.indexOf("\n") < tableOptions.names.length - 1
+                        ? [
+                            ...Array(tableOptions.keys.slice(0, tableOptions.keys.indexOf("\n") !== -1
+                                ? tableOptions.keys.indexOf("\n") - 1
+                                : tableOptions.keys.length - 1).length),
+                        ].map((a) => "")
+                        : []),
                 ];
             tableOptions.names.forEach((name, i) => {
                 let th = elements.createElement("th", {
@@ -983,8 +987,12 @@ class elements {
                 });
                 thtr.appendChild(th);
             });
-            if (tableOptions.names.length > 0)
+            if (tableOptions.names.length > 0 && tableOptions.namesInTopTable) {
                 tableNamesElem.appendChild(thtr);
+            }
+            else {
+                tableElem.appendChild(thtr);
+            }
         }
         if (tableOptions.dropdownSort) {
             elements.createElement("h", {
