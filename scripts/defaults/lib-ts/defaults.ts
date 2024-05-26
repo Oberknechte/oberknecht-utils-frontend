@@ -656,10 +656,13 @@ export class elements {
   static #notificationClosing = false;
   static #isErrorNotification = false;
   static #notificationChangingTimeout;
+  static #lastNotification;
   static notification = (
     dat: string | Error | any,
     notificationOptions_?: notificationOptionsType
   ) => {
+    let this_ = this;
+
     let notificationOptions = concatJSON([
       functions.options?.notificationOptions ?? {},
       notificationOptions_ ?? {},
@@ -673,6 +676,19 @@ export class elements {
         defaultNotificationErrorAnimationDuration
       : notificationOptions.animationDuration ??
         defaultNotificationAnimationDuration;
+
+    let notificationOptionsLast = {
+      options: notificationOptions,
+      dat: dat,
+    };
+    if (
+      this.#lastNotification &&
+      JSON.stringify(this.#lastNotification) ===
+        JSON.stringify(notificationOptionsLast)
+    )
+      return;
+
+    this.#lastNotification = notificationOptionsLast;
 
     let notificationsParentElem: HTMLElement = functions.getElement(
       notificationOptions.parentElem ?? "body"
@@ -800,6 +816,8 @@ export class elements {
         notificationsContainerElem.remove();
         notificationsParentElem.classList.remove("jnotification-parent");
       }
+
+      this_.#lastNotification = undefined;
 
       notificationOptions.onclose?.(byUser);
     }
